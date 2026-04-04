@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M3 Piecewise Functions Project — Algebra 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a2e; --ink2:#2d2d4e;
+  --paper:#f5f0e8; --paper2:#ede7d9; --paper3:#e0d8c8;
+  --gold:#c9a227; --gold-light:#f0c93a;
+  --teal:#1a7a6e; --teal-light:#d4f0ec;
+  --coral:#c0392b; --neutral:#6b6b8a;
+  --r:6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.5}
+
+/* HEADER */
+.site-header{background:var(--ink);color:var(--paper);padding:22px 32px;position:sticky;top:0;z-index:100;border-bottom:4px solid var(--teal)}
+.header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.header-brand{display:flex;align-items:center;gap:14px}
+.badge-icon{width:48px;height:48px;background:var(--teal);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0}
+.header-title{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.02em}
+.header-sub{font-size:11px;color:rgba(245,240,232,.5);margin-top:2px;font-family:'DM Mono',monospace}
+.code-pill{background:rgba(26,122,110,.2);border:1.5px solid var(--teal);border-radius:99px;padding:6px 16px;font-family:'DM Mono',monospace;font-weight:700;font-size:13px;color:var(--teal-light)}
+
+/* MAIN */
+.main{max-width:900px;margin:0 auto;padding:32px 24px 80px;position:relative;z-index:1}
+
+/* SECTION BARS */
+.section-bar{background:var(--ink);color:var(--paper);border-radius:var(--r);padding:10px 18px;
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;margin:28px 0 14px;
+  border-bottom:3px solid var(--teal);display:flex;align-items:center;gap:10px}
+
+/* INFO CARDS */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.info-card{background:white;border:2px solid var(--paper3);border-radius:var(--r);padding:14px 16px;border-top:3px solid var(--teal)}
+.ic-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--neutral);margin-bottom:4px}
+.ic-value{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700}
+
+/* CODE BLOCK (piecewise notation display) */
+.code-block{background:var(--ink);border-radius:var(--r);padding:16px 20px;margin:14px 0;border-left:4px solid var(--teal)}
+.code-block .code-line{font-family:'DM Mono',monospace;font-size:14px;color:#a8ff3e;line-height:2;display:block}
+.code-block .code-comment{font-family:'DM Mono',monospace;font-size:11px;color:#6b9fd0;line-height:1.6;display:block;margin-top:2px}
+
+/* GOLD / TEAL BOX */
+.gold-box{background:var(--paper2);border-left:4px solid var(--gold);border-radius:0 var(--r) var(--r) 0;
+  padding:14px 18px;margin-bottom:10px;font-size:13.5px;line-height:1.75;border:1px solid var(--paper3);border-left:4px solid var(--gold)}
+.teal-box{background:var(--teal-light);border-left:4px solid var(--teal);border-radius:0 var(--r) var(--r) 0;
+  padding:14px 18px;margin-bottom:10px;font-size:13.5px;line-height:1.75;border:1px solid var(--teal);border-left:4px solid var(--teal)}
+
+/* KEY IDEAS TABLE */
+.key-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13.5px}
+.key-table th{background:var(--ink);color:var(--paper);padding:9px 14px;text-align:left;font-family:'Outfit',sans-serif;font-weight:700;font-size:12px}
+.key-table td{padding:9px 14px;vertical-align:top;border-bottom:1px solid var(--paper3)}
+.key-table tr:nth-child(even) td{background:var(--paper2)}
+.key-table tr:nth-child(odd) td{background:white}
+.key-table td:first-child{font-weight:700;color:var(--teal);white-space:nowrap;width:170px;border-right:3px solid var(--teal)}
+
+/* SCENARIOS */
+.scenario-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.scenario-item{background:white;border:1.5px solid var(--paper3);border-radius:var(--r);padding:0;overflow:hidden;display:flex}
+.scenario-left{background:var(--paper2);padding:14px 14px;min-width:150px;max-width:150px;border-right:3px solid var(--gold)}
+.scenario-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:4px}
+.scenario-type{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
+.scenario-right{padding:12px 16px;font-size:13px;line-height:1.7;flex:1}
+
+/* WEEK TIMELINE */
+.week-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.day-block{border:1.5px solid var(--paper3);border-radius:var(--r);overflow:hidden}
+.day-header{display:flex;align-items:stretch;cursor:pointer}
+.day-num{background:var(--ink);color:var(--paper);padding:14px 14px;font-family:'Outfit',sans-serif;font-weight:800;font-size:13px;min-width:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.3}
+.day-num .day-label{font-size:10px;opacity:.6;font-family:'DM Mono',monospace;font-weight:400;margin-top:3px}
+.day-title-wrap{background:var(--paper2);padding:14px 18px;flex:1;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--teal)}
+.day-title-text{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px}
+.day-deliverable{font-size:11px;font-family:'DM Mono',monospace;color:var(--teal);margin-top:3px}
+.chevron{font-size:18px;color:var(--neutral);transition:transform .3s;flex-shrink:0}
+.day-tasks{padding:12px 18px 14px 20px;background:white;display:none}
+.day-tasks.open{display:block}
+.day-tasks ul{list-style:none;padding:0}
+.day-tasks ul li{padding:5px 0;font-size:13.5px;line-height:1.6;display:flex;gap:8px}
+.day-tasks ul li::before{content:'\2022';color:var(--teal);font-weight:700;flex-shrink:0;margin-top:1px}
+.day-block.active .chevron{transform:rotate(180deg)}
+
+/* REPORT SECTIONS */
+.report-section{background:white;border:2px solid var(--paper3);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.rs-header{background:var(--paper2);padding:12px 18px;border-bottom:2px solid var(--paper3);display:flex;justify-content:space-between;align-items:center}
+.rs-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;color:var(--teal)}
+.rs-pts{font-family:'DM Mono',monospace;font-size:12px;color:var(--neutral);background:var(--paper3);border-radius:99px;padding:3px 10px}
+.rs-body{padding:14px 18px;font-size:13.5px;line-height:1.8}
+.rs-body ol,.rs-body ul{margin:8px 0 8px 20px}
+.rs-body li{margin-bottom:4px}
+
+/* VIDEO */
+.video-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.vid-card{background:white;border:2px solid var(--paper3);border-radius:var(--r);padding:16px}
+.vid-card h4{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--teal);margin-bottom:10px;border-bottom:2px solid var(--paper3);padding-bottom:8px}
+.vid-card ul{list-style:none;padding:0;font-size:13px;line-height:1.7}
+.vid-card ul li{padding:3px 0;display:flex;gap:8px}
+.vid-card ul li::before{content:'\2022';color:var(--teal);font-weight:700;flex-shrink:0}
+
+/* MATH TALK */
+.question-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.q-item{background:var(--teal-light);border-left:3px solid var(--teal);border-radius:0 var(--r) var(--r) 0;padding:10px 16px;font-size:13.5px;line-height:1.6;font-style:italic;color:var(--ink2)}
+
+/* RUBRIC */
+.rubric-block{margin-bottom:28px}
+.rubric-criterion{margin-bottom:18px;border:2px solid var(--paper3);border-radius:var(--r);overflow:hidden;box-shadow:2px 2px 0 var(--paper3)}
+.rc-header{background:var(--ink);color:var(--paper);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.rc-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:13px}
+.rc-levels{display:grid;grid-template-columns:repeat(4,1fr)}
+.rc-cell{padding:11px 13px;font-size:12.5px;line-height:1.6;border-right:1px solid var(--paper3)}
+.rc-cell:last-child{border-right:none}
+.rc-cell-hd{font-family:'Outfit',sans-serif;font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.rc-pr{background:#d4f0ec}.rc-pr .rc-cell-hd{color:#0f5a51}
+.rc-dv{background:#fef9e7}.rc-dv .rc-cell-hd{color:#7a5c00}
+.rc-em{background:#fde8e6}.rc-em .rc-cell-hd{color:#7a1a12}
+.rc-na{background:var(--paper2)}.rc-na .rc-cell-hd{color:var(--neutral)}
+.rc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block}
+.dot-pr{background:#1a7a6e}.dot-dv{background:#c9a227}.dot-em{background:#c0392b}.dot-na{background:#aaa}
+
+/* SUPPORT */
+.support-grid{display:flex;flex-direction:column;gap:8px}
+.support-item{background:white;border:1.5px solid var(--paper3);border-radius:var(--r);padding:12px 16px;font-size:13.5px;line-height:1.7;display:flex;gap:12px;align-items:flex-start}
+.s-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+
+/* PRINT BUTTON */
+.print-btn{position:fixed;bottom:24px;right:24px;background:var(--teal);color:white;border:none;padding:12px 22px;border-radius:99px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:200;transition:all .15s;display:flex;align-items:center;gap:8px}
+.print-btn:hover{background:var(--ink);transform:translateY(-2px)}
+
+/* PROJECT CHOICE BANNER */
+.choice-banner{background:var(--ink);border-radius:var(--r);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px;border:2px solid var(--teal)}
+.cb-left{font-size:32px;flex-shrink:0}
+.cb-text{font-size:13.5px;line-height:1.7;color:var(--paper)}
+.cb-text strong{color:var(--gold)}
+
+@media(max-width:680px){
+  .info-grid{grid-template-columns:1fr 1fr}
+  .video-cols{grid-template-columns:1fr}
+  .scenario-left{min-width:120px;max-width:120px}
+  .rubric-table{font-size:11px}
+}
+@media print{.print-btn,.site-header{display:none}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="badge-icon">&#x1F9E9;</div>
+      <div>
+        <div class="header-title">M3 Piecewise Functions Project</div>
+        <div class="header-sub">Real-World Modelling &nbsp;&middot;&nbsp; Algebra 1 &nbsp;&middot;&nbsp; Virtual Classroom</div>
+      </div>
+    </div>
+    <div class="code-pill">ALG1A</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- CHOICE BANNER -->
+  <div class="choice-banner">
+    <div class="cb-left">&#x1F4A1;</div>
+    <div class="cb-text">
+      <strong>Project Choice:</strong> This is one of two M3 capstone options.
+      The <strong>Function Detective Project</strong> covers all M3 function families.
+      This project focuses specifically on <strong>piecewise functions</strong> and their real-world applications.
+      Choose the one that best fits your interests &mdash; both are worth 100 points.
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="section-bar">&#x1F4CB; OVERVIEW</div>
+
+  <p style="font-size:14.5px;line-height:1.8;margin-bottom:18px">
+    Piecewise functions are everywhere in the real world &mdash; tax brackets, electricity tariffs,
+    parking fees, delivery pricing, and speed limits all follow different rules for different intervals.
+    In this project you will <strong>find, model, and explain</strong> a real-world situation using a
+    piecewise function, then present your findings in a <strong>written report</strong>, a short
+    <strong>explainer video</strong>, and a live <strong>Virtual Math Talk</strong> with your teacher.
+  </p>
+
+  <div class="info-grid">
+    <div class="info-card"><div class="ic-label">Duration</div><div class="ic-value">One Week</div></div>
+    <div class="info-card"><div class="ic-label">Total Points</div><div class="ic-value">100 points</div></div>
+    <div class="info-card"><div class="ic-label">Parts</div><div class="ic-value">Report + Video + Talk</div></div>
+    <div class="info-card"><div class="ic-label">Submission</div><div class="ic-value">Google Classroom</div></div>
+    <div class="info-card"><div class="ic-label">Math Talk</div><div class="ic-value">Day 5 &mdash; 10 min</div></div>
+    <div class="info-card"><div class="ic-label">Class Code</div><div class="ic-value" style="font-family:'DM Mono',monospace">ALG1A</div></div>
+  </div>
+
+  <!-- WHAT IS A PIECEWISE FUNCTION -->
+  <div class="section-bar">&#x1F9EE; WHAT IS A PIECEWISE FUNCTION? (Quick Recap)</div>
+
+  <p style="font-size:13.5px;line-height:1.7;margin-bottom:10px">
+    A <strong>piecewise function</strong> uses different rules (formulas) for different parts of its domain.
+    The standard notation looks like this:
+  </p>
+
+  <div class="code-block">
+    <span class="code-line">f(x) = &#123; Rule 1 &nbsp;&nbsp; if &nbsp; condition 1</span>
+    <span class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123; Rule 2 &nbsp;&nbsp; if &nbsp; condition 2</span>
+    <span class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123; Rule 3 &nbsp;&nbsp; if &nbsp; condition 3</span>
+    <span class="code-comment">&#x2192; Each rule is a formula (e.g. 2x + 1). Each condition is an inequality (e.g. x &ge; 0).</span>
+  </div>
+
+  <p style="font-size:13.5px;line-height:1.7;margin-bottom:12px"><strong>Key ideas you must demonstrate in this project:</strong></p>
+
+  <table class="key-table">
+    <thead><tr><th>Concept</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>Correct notation</td><td>Use the curly brace { notation with conditions written as inequalities (e.g. x &ge; 0, x &lt; 5).</td></tr>
+      <tr><td>Domain intervals</td><td>Each piece applies to a specific interval. Intervals must not overlap and must together cover the full domain.</td></tr>
+      <tr><td>Open &amp; closed dots</td><td>Closed dot &#x25CF; = value IS included. Open dot &#x25CB; = value is NOT included. At every boundary, exactly one piece owns that value.</td></tr>
+      <tr><td>Continuity check</td><td>A piecewise function is continuous at a boundary if both pieces give the same output there. If not, there is a jump discontinuity.</td></tr>
+      <tr><td>Graph features</td><td>Label intercepts, domain, range, and whether each piece is increasing or decreasing.</td></tr>
+      <tr><td>Real-world meaning</td><td>Every piece and every boundary must have a clear interpretation in your chosen real-world context.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- SCENARIO CHOICE -->
+  <div class="section-bar">&#x1F4E6; STEP 1 &mdash; CHOOSE YOUR SCENARIO</div>
+
+  <p style="font-size:13.5px;line-height:1.7;margin-bottom:12px">
+    Choose <strong>one scenario</strong> below, or propose your own (teacher must approve by Day 1).
+    Your scenario must have <strong>at least 3 pieces</strong> and be based on real data or a realistic situation.
+  </p>
+
+  <div class="scenario-list">
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Electricity Tariff</div><div class="scenario-type">Linear pieces</div></div>
+      <div class="scenario-right">Many electricity providers charge different rates per unit depending on how much you use. For example: 0.20 SAR/kWh for the first 6,000 kWh, then 0.30 SAR/kWh for the next 6,000, then 0.40 SAR/kWh beyond 12,000. Model C(x) where x is monthly consumption in kWh.</div>
+    </div>
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Taxi / Ride-hailing Fare</div><div class="scenario-type">Linear pieces</div></div>
+      <div class="scenario-right">A taxi charges a fixed pickup fee, then a per-km rate that changes after a certain distance (e.g. first 5 km at one rate, then a higher rate for longer trips). Model the cost C(x) where x is distance or time.</div>
+    </div>
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Income Tax Brackets</div><div class="scenario-type">Linear pieces</div></div>
+      <div class="scenario-right">Tax systems apply different percentage rates to different income bands. Look up a real tax bracket system (Saudi Arabia, UK, USA, or another country) and model the tax owed T(x) as a function of taxable income x.</div>
+    </div>
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Parking Fees</div><div class="scenario-type">Linear pieces</div></div>
+      <div class="scenario-right">Many car parks charge by the hour with a cap: e.g. 5 SAR/hour for the first 3 hours, then 3 SAR/hour up to 8 hours, then a flat daily rate after 8 hours. Model the fee F(x) where x is hours parked.</div>
+    </div>
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Delivery Pricing</div><div class="scenario-type">Step / linear mix</div></div>
+      <div class="scenario-right">An online shop charges different shipping rates based on order value: free above a threshold, flat fee in a middle range, per-kg charge for heavy or low-value orders. Model the shipping cost S(x).</div>
+    </div>
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Water Bill</div><div class="scenario-type">Linear pieces</div></div>
+      <div class="scenario-right">Municipal water bills often use tiered pricing. Model the monthly bill W(x) as a function of water consumed (in cubic metres) using a real or realistic tariff structure from any city.</div>
+    </div>
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Sports Performance Zone</div><div class="scenario-type">Can mix types</div></div>
+      <div class="scenario-right">A coach tracks whether an athlete is in the correct heart-rate zone. Zones change at specific thresholds (recovery, aerobic, anaerobic). Model the intensity level or calorie burn rate as a piecewise function of heart rate.</div>
+    </div>
+
+    <div class="scenario-item">
+      <div class="scenario-left"><div class="scenario-title">Custom Scenario</div><div class="scenario-type">Any type</div></div>
+      <div class="scenario-right">Any real piecewise situation you find (must have at least 3 pieces and be approved by Day 1). Include a source for your data.</div>
+    </div>
+
+  </div>
+
+  <!-- WEEK SCHEDULE -->
+  <div class="section-bar">&#x1F4C5; WEEK SCHEDULE &mdash; CLICK EACH DAY TO EXPAND</div>
+
+  <div class="week-grid">
+
+    <div class="day-block active" id="day1">
+      <div class="day-header" onclick="toggleDay('day1')">
+        <div class="day-num">Day 1<span class="day-label">Monday</span></div>
+        <div class="day-title-wrap">
+          <div><div class="day-title-text">CHOOSE &amp; RESEARCH</div>
+          <div class="day-deliverable">&#x1F4E4; Deliverable: Data table with at least 3 pieces in Google Classroom</div></div>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+      <div class="day-tasks open" id="tasks-day1"><ul>
+        <li>Choose your scenario from the list above (or submit a custom proposal to your teacher).</li>
+        <li>Research and collect real data: find the actual pricing tiers, tax brackets, or rate thresholds.</li>
+        <li>Record your data in a table with at least 3 rows showing the interval (domain) and the rule for each piece.</li>
+        <li>Identify what x represents and what f(x) represents, including units (e.g. x = kWh used, f(x) = cost in SAR).</li>
+        <li>Message your teacher or confirm in the virtual check-in to get your scenario approved before proceeding.</li>
+      </ul></div>
+    </div>
+
+    <div class="day-block" id="day2">
+      <div class="day-header" onclick="toggleDay('day2')">
+        <div class="day-num">Day 2<span class="day-label">Tuesday</span></div>
+        <div class="day-title-wrap">
+          <div><div class="day-title-text">MODEL &amp; WRITE NOTATION</div>
+          <div class="day-deliverable">&#x1F4E4; Deliverable: Written piecewise notation + 4 evaluated inputs to teacher</div></div>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+      <div class="day-tasks" id="tasks-day2"><ul>
+        <li>Write the piecewise function using correct notation: curly brace, each rule on its own line, with the domain condition.</li>
+        <li>For each linear piece, identify the slope and y-intercept and write f(x) = mx + b.</li>
+        <li>Determine whether the function is continuous at each boundary &mdash; show the calculation for each one.</li>
+        <li>Decide the open/closed dot at each boundary: which piece owns that exact value?</li>
+        <li>Calculate f(x) for at least 4 specific inputs across different pieces. Interpret each one in context.</li>
+        <li>Deliverable: Written piecewise notation + 4 evaluated inputs shared with teacher by end of day.</li>
+      </ul></div>
+    </div>
+
+    <div class="day-block" id="day3">
+      <div class="day-header" onclick="toggleDay('day3')">
+        <div class="day-num">Day 3<span class="day-label">Wednesday</span></div>
+        <div class="day-title-wrap">
+          <div><div class="day-title-text">GRAPH &amp; ANALYSE</div>
+          <div class="day-deliverable">&#x1F4E4; Deliverable: Graph completed + draft report uploaded</div></div>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+      <div class="day-tasks" id="tasks-day3"><ul>
+        <li>Draw the graph of your piecewise function on coordinate axes (grid paper or Desmos &mdash; type it as {x&gt;0: 2x+1, x&lt;=0: -x+3}).</li>
+        <li>Label every boundary point with a correct open &#x25CB; or closed &#x25CF; dot.</li>
+        <li>Label and interpret: domain, range, any intercepts, and whether each piece is increasing or decreasing.</li>
+        <li>Write a description of what each piece and each boundary value means in your real-world context.</li>
+        <li>Begin writing your full report (see Part A below for the section structure).</li>
+        <li>Deliverable: Graph completed and draft report uploaded as a Google Doc for teacher feedback.</li>
+      </ul></div>
+    </div>
+
+    <div class="day-block" id="day4">
+      <div class="day-header" onclick="toggleDay('day4')">
+        <div class="day-num">Day 4<span class="day-label">Thursday</span></div>
+        <div class="day-title-wrap">
+          <div><div class="day-title-text">WRITE, RECORD &amp; SUBMIT</div>
+          <div class="day-deliverable">&#x1F4E4; Deliverable: Final report + video link in Google Classroom</div></div>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+      <div class="day-tasks" id="tasks-day4"><ul>
+        <li>Act on any teacher feedback on your draft report. Finalise and submit.</li>
+        <li>Record your 3&ndash;5 minute explainer video (see Video Guidelines below).</li>
+        <li>Upload the video to Google Drive, share the link, and submit via Google Classroom.</li>
+        <li>File naming: YourName_M3_Piecewise_Report and YourName_M3_Piecewise_Video.</li>
+        <li>Deliverable: Final report + video link submitted by end of day.</li>
+      </ul></div>
+    </div>
+
+    <div class="day-block" id="day5">
+      <div class="day-header" onclick="toggleDay('day5')">
+        <div class="day-num">Day 5<span class="day-label">Friday</span></div>
+        <div class="day-title-wrap">
+          <div><div class="day-title-text">VIRTUAL MATH TALK</div>
+          <div class="day-deliverable">&#x1F4DE; Attend your scheduled 10-minute call</div></div>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+      <div class="day-tasks" id="tasks-day5"><ul>
+        <li>Attend your scheduled 10-minute one-on-one call with your teacher.</li>
+        <li>Be ready to explain your piecewise function, what each piece means, and how you checked continuity.</li>
+        <li>Your teacher will give you a specific x-value and ask you to evaluate f(x) and interpret it live.</li>
+        <li>You may have your graph and report visible on screen during the call.</li>
+        <li>No new work to submit today &mdash; this is a conversation, not a test.</li>
+      </ul></div>
+    </div>
+
+  </div>
+
+  <!-- PART A: REPORT -->
+  <div class="section-bar">&#x1F4DD; PART A &mdash; INVESTIGATION REPORT &nbsp;(50 points)</div>
+
+  <p style="font-size:13.5px;line-height:1.7;margin-bottom:14px">
+    Write in complete sentences. All mathematical work must be clearly shown. Submit as a PDF or shared Google Doc.
+  </p>
+
+  <div class="report-section">
+    <div class="rs-header"><span class="rs-title">Section 1 &mdash; Scenario Introduction</span><span class="rs-pts">8 pts</span></div>
+    <div class="rs-body">
+      Introduce your real-world scenario. Explain what it represents, where your data or rates came from,
+      and why piecewise functions are the right tool to model it.
+      Define what x represents and what f(x) represents, including real-world units.
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="rs-header"><span class="rs-title">Section 2 &mdash; The Piecewise Function</span><span class="rs-pts">22 pts</span></div>
+    <div class="rs-body">
+      This is the mathematical core. You must include all of the following:
+      <ol type="a">
+        <li>The complete piecewise function in correct curly-brace notation with all pieces and conditions.</li>
+        <li>For each linear piece: slope m, y-intercept b, and the formula f(x) = mx + b with m and b explained in context.</li>
+        <li>The domain and range of the complete function.</li>
+        <li>A continuity check at <em>every</em> boundary: show the calculation and state whether there is a jump or not.</li>
+        <li>Evaluation of f(x) for at least 4 specific x-values (at least one per piece) with full contextual interpretation.</li>
+        <li>The graph, with correct open/closed dots at every boundary, labelled axes, and labelled intercepts.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="rs-header"><span class="rs-title">Section 3 &mdash; Real-World Interpretation</span><span class="rs-pts">12 pts</span></div>
+    <div class="rs-body">
+      For each piece of your function:
+      <ol type="a">
+        <li>Explain what the rule (formula) means in plain English &mdash; why does the rate or value apply here?</li>
+        <li>Explain what each boundary value means (e.g. &ldquo;after 6,000 kWh, the rate increases because...&rdquo;).</li>
+        <li>Discuss whether the function is continuous or has jump discontinuities, and what that means practically (e.g. does a customer pay dramatically more for using just one extra unit?).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="rs-header"><span class="rs-title">Section 4 &mdash; Extension: Absolute Value Connection</span><span class="rs-pts">8 pts</span></div>
+    <div class="rs-body">
+      The absolute value function is itself a piecewise function:
+      <div class="teal-box" style="margin:10px 0">
+        f(x) = |x| = &#123; x &nbsp; if &nbsp; x &ge; 0 &nbsp;&nbsp; and &nbsp;&nbsp; &minus;x &nbsp; if &nbsp; x &lt; 0 &#125;
+      </div>
+      Choose <strong>one</strong> of the following tasks:
+      <ol type="a" style="margin-top:8px">
+        <li>Show how your scenario (or a related one) could be modelled or approximated using an absolute value function. Write the function in vertex form f(x) = a|x &minus; h| + k and identify and interpret the vertex.</li>
+        <li><strong>OR:</strong> Write a new real-world scenario (different from your main one) that is naturally modelled by an absolute value function. State the function, graph it, and interpret the vertex and both pieces.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- PART B: VIDEO -->
+  <div class="section-bar">&#x1F3A5; PART B &mdash; CONCEPT EXPLAINER VIDEO &nbsp;(30 points)</div>
+
+  <p style="font-size:13.5px;line-height:1.7;margin-bottom:14px">
+    Record a <strong>3 to 5 minute</strong> video explaining your piecewise function to a classmate.
+    Focus on making the notation, graph, and real-world meaning clear and easy to follow.
+  </p>
+
+  <div class="video-cols">
+    <div class="vid-card">
+      <h4>What to Include</h4>
+      <ul>
+        <li>Your name and scenario title (first 20 seconds)</li>
+        <li>Read the piecewise function out loud and explain what each piece means</li>
+        <li>Show or draw the graph with open/closed dots clearly marked</li>
+        <li>Evaluate f(x) for one value from each piece and interpret the result</li>
+        <li>Explain continuity: are the pieces connected at the boundaries?</li>
+        <li>Explain the absolute value extension (Section 4)</li>
+      </ul>
+    </div>
+    <div class="vid-card">
+      <h4>Guidelines</h4>
+      <ul>
+        <li>Length: 3 to 5 minutes (outside this range loses points)</li>
+        <li>Speak on camera or narrate clearly over whiteboard/slides</li>
+        <li>Write the piecewise notation on screen &mdash; do not just read from notes</li>
+        <li>Upload to Google Drive, share link via Google Classroom</li>
+        <li>File name: YourName_M3_Piecewise_Video</li>
+        <li>Test your audio before recording!</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PART C: MATH TALK -->
+  <div class="section-bar">&#x1F4AC; PART C &mdash; VIRTUAL MATH TALK &nbsp;(20 points)</div>
+
+  <p style="font-size:13.5px;line-height:1.7;margin-bottom:12px">
+    On Day 5 you will meet your teacher for a <strong>10-minute one-on-one call</strong>.
+    This is a conversation &mdash; come ready to discuss your work naturally. Sample questions:
+  </p>
+
+  <div class="question-list">
+    <div class="q-item">&ldquo;Read me your piecewise function out loud and explain what each piece means in your scenario.&rdquo;</div>
+    <div class="q-item">&ldquo;Why is there a change at that specific boundary value? What happens in the real world at that point?&rdquo;</div>
+    <div class="q-item">&ldquo;If x = [specific value], which piece do you use? What does f(x) equal, and what does it mean?&rdquo;</div>
+    <div class="q-item">&ldquo;Is your function continuous at x = [boundary]? Show me the calculation.&rdquo;</div>
+    <div class="q-item">&ldquo;What would change in your function if the rate in piece 2 increased by 10%?&rdquo;</div>
+    <div class="q-item">&ldquo;How is your function related to an absolute value function? What would the vertex represent?&rdquo;</div>
+  </div>
+
+  <div class="gold-box">
+    <strong>Tip:</strong> Practise reading your piecewise notation out loud before the call.
+    Have your graph visible on screen. Know which piece applies for any given x-value before the call starts.
+  </div>
+
+  <!-- RUBRIC -->
+  <div class="section-bar">&#x1F4CA; RUBRIC</div>
+
+  <p style="font-size:13.5px;line-height:1.7;margin-bottom:18px">
+    Your project is assessed across three criteria using four performance levels.
+    Your workbook grades these automatically when you submit — your teacher reviews and finalises your level.
+  </p>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:7px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#0f5a51"><span class="rc-dot dot-pr"></span> Proficient (PR)</div>
+    <div style="display:flex;align-items:center;gap:7px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#7a5c00"><span class="rc-dot dot-dv"></span> Developing (DV)</div>
+    <div style="display:flex;align-items:center;gap:7px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#7a1a12"><span class="rc-dot dot-em"></span> Emerging (EM)</div>
+    <div style="display:flex;align-items:center;gap:7px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--neutral)"><span class="rc-dot dot-na"></span> Not Assessed (NA)</div>
+  </div>
+
+  <div class="rubric-block">
+
+    <!-- Criterion 1 -->
+    <div class="rubric-criterion">
+      <div class="rc-header">
+        <div class="rc-title">&#x1F9EE; Concepts &amp; Procedures</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(245,240,232,.5)">Piecewise notation · Graph · Evaluation</div>
+      </div>
+      <div class="rc-levels">
+        <div class="rc-cell rc-pr">
+          <div class="rc-cell-hd"><span class="rc-dot dot-pr"></span>Proficient</div>
+          Carries out all procedures with precision and fluency. Correctly writes piecewise notation with all pieces, conditions, and curly-brace format. Accurately graphs all segments with correct open/closed endpoints, slopes, and labelled axes. Evaluates f(x) at multiple values across all pieces without errors. Makes clear connections between the algebraic rule, table of values, and graph.
+        </div>
+        <div class="rc-cell rc-dv">
+          <div class="rc-cell-hd"><span class="rc-dot dot-dv"></span>Developing</div>
+          Carries out procedures with some precision. Piecewise notation is mostly correct with one or two minor errors in domain boundaries or endpoint notation. Graph is largely accurate with small errors at one or two segments or endpoints. Evaluates most values correctly. Makes some connections between representations.
+        </div>
+        <div class="rc-cell rc-em">
+          <div class="rc-cell-hd"><span class="rc-dot dot-em"></span>Emerging</div>
+          Carries out procedures with limited precision. Piecewise notation is attempted but domains are incomplete or incorrect. Graph has several errors in segments or endpoint dots. Evaluation of f(x) contains errors or is incomplete. Makes limited connections between the algebraic rule and other representations.
+        </div>
+        <div class="rc-cell rc-na">
+          <div class="rc-cell-hd"><span class="rc-dot dot-na"></span>Not Assessed</div>
+          Did not demonstrate knowledge or understanding of piecewise procedures. No notation attempted, no graph produced, or no evaluations completed.
+        </div>
+      </div>
+    </div>
+
+    <!-- Criterion 2 -->
+    <div class="rubric-criterion">
+      <div class="rc-header">
+        <div class="rc-title">&#x1F4AC; Reasoning &amp; Communication</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(245,240,232,.5)">Mathematical language · Notation · Justification</div>
+      </div>
+      <div class="rc-levels">
+        <div class="rc-cell rc-pr">
+          <div class="rc-cell-hd"><span class="rc-dot dot-pr"></span>Proficient</div>
+          Communicates using precise mathematical language throughout — domain, range, interval, boundary, continuity, open/closed dot — with correct symbolic notation and units throughout. Clearly explains what each piece of the function represents in real-world context with a detailed and organised mathematical argument. Makes valid conceptual connections and justifies all mathematical claims logically.
+        </div>
+        <div class="rc-cell rc-dv">
+          <div class="rc-cell-hd"><span class="rc-dot dot-dv"></span>Developing</div>
+          Uses some mathematical language and mostly correct notation. Explains the meaning of most pieces in context with units mostly present. Makes some valid arguments but justification of some claims is incomplete or partially organised.
+        </div>
+        <div class="rc-cell rc-em">
+          <div class="rc-cell-hd"><span class="rc-dot dot-em"></span>Emerging</div>
+          Uses limited mathematical language. Notation has significant errors or is missing. Explanation of real-world meaning is vague, incomplete, or missing units. Mathematical thinking is present but disorganised or hard to follow.
+        </div>
+        <div class="rc-cell rc-na">
+          <div class="rc-cell-hd"><span class="rc-dot dot-na"></span>Not Assessed</div>
+          Did not demonstrate mathematical language or mathematical thinking. No contextual explanation present.
+        </div>
+      </div>
+    </div>
+
+    <!-- Criterion 3 -->
+    <div class="rubric-criterion">
+      <div class="rc-header">
+        <div class="rc-title">&#x1F30D; Problem Solving &amp; Modelling</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(245,240,232,.5)">Scenario selection · Model construction · Analysis</div>
+      </div>
+      <div class="rc-levels">
+        <div class="rc-cell rc-pr">
+          <div class="rc-cell-hd"><span class="rc-dot dot-pr"></span>Proficient</div>
+          Selects an appropriate and interesting real-world scenario and constructs a complete, accurate piecewise model with at least 3 pieces. Executes all mathematical procedures accurately — evaluations, continuity checks, absolute value extension. Provides in-depth written analysis explaining why piecewise modelling fits the situation, what each piece represents, and what happens at boundaries. Interprets outputs meaningfully in context.
+        </div>
+        <div class="rc-cell rc-dv">
+          <div class="rc-cell-hd"><span class="rc-dot dot-dv"></span>Developing</div>
+          Selects an appropriate scenario and builds a mostly complete model. Executes procedures with some minor computational errors. Evaluates the function at most input values correctly. Provides some analysis of the modelling choice with some real-world interpretation of boundaries and outputs.
+        </div>
+        <div class="rc-cell rc-em">
+          <div class="rc-cell-hd"><span class="rc-dot dot-em"></span>Emerging</div>
+          Selects a scenario but the model is incomplete or has conceptual errors. Executes procedures with minor conceptual and computational errors. Evaluation of f(x) contains errors. Analysis of the modelling choice is limited — pieces or boundaries are not explained in real-world terms.
+        </div>
+        <div class="rc-cell rc-na">
+          <div class="rc-cell-hd"><span class="rc-dot dot-na"></span>Not Assessed</div>
+          Did not provide analysis of problem solving strategies. No real-world scenario modelled, or no evaluation or analysis attempted.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end rubric-block -->
+
+  <!-- SUPPORT -->
+  <div class="section-bar">&#x1F4DA; SUPPORT RESOURCES</div>
+
+  <div class="support-grid">
+    <div class="support-item"><span class="s-icon">&#x1F9E9;</span>
+      <div><strong>m3-review.html</strong> on the classroom portal (ALG1A) &mdash; the Piecewise Functions and Absolute Value sections have all the notation rules, graphing methods, and word problem practice you need.</div>
+    </div>
+    <div class="support-item"><span class="s-icon">&#x1F4BB;</span>
+      <div><strong>Desmos</strong> (desmos.com/calculator) &mdash; type piecewise functions directly using curly braces and Desmos will graph each piece with boundary dots automatically. Try: <code style="background:#e0d8c8;padding:2px 6px;border-radius:4px">{x&gt;=0: 2x+1, x&lt;0: -x+3}</code></div>
+    </div>
+    <div class="support-item"><span class="s-icon">&#x1F469;&#x200D;&#x1F3EB;</span>
+      <div><strong>Your teacher</strong> &mdash; message via Google Classroom for scenario approval (Day 1) and draft feedback (Day 3). Schedule your Math Talk time on Day 4.</div>
+    </div>
+    <div class="support-item" style="border-left:3px solid var(--coral)">
+      <span class="s-icon">&#x2757;</span>
+      <div><strong>Academic integrity:</strong> All written analysis and interpretations must be your own. You may use Desmos or a calculator for graphs and arithmetic, but all explanations of what the mathematics means must be in your own words.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;text-align:center;font-size:12px;color:var(--neutral);font-family:'DM Mono',monospace;padding-top:16px;border-top:2px solid var(--paper3)">
+    M3: Sequences and Functions &nbsp;&middot;&nbsp; Piecewise Functions Project &nbsp;&middot;&nbsp; Algebra 1 Virtual Classroom &nbsp;&middot;&nbsp; raaziaali.github.io
+  </div>
+
+</main>
+
+<button class="print-btn" onclick="window.print()">&#x1F5A8;&#xFE0F; Print / Save PDF</button>
+
+<script>
+function toggleDay(id){
+  var b=document.getElementById(id), t=document.getElementById('tasks-'+id);
+  var open=t.classList.contains('open');
+  t.classList.toggle('open',!open);
+  b.classList.toggle('active',!open);
+}
+</script>
+</body>
+</html>
