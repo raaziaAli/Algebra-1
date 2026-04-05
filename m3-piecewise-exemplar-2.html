@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M3 Piecewise Project — Student Exemplar</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e; --ink2:#2d2d4e;
+  --paper:#f5f0e8; --paper2:#ede7d9; --paper3:#e0d8c8;
+  --gold:#c9a227; --gold-light:#f7e17a;
+  --teal:#1a7a6e; --teal2:#25a898; --teal-light:#d4f0ec;
+  --coral:#c0392b; --coral-light:#fde8e6;
+  --green:#1a7a3c; --green-light:#d4f0e0;
+  --amber:#d97706; --amber-light:#fef3c7;
+  --neutral:#6b6b8a; --r:8px;
+  --ex:#7c3aed; --ex-light:#ede9fe;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+.site-header{background:var(--ink);padding:0 32px;position:sticky;top:0;z-index:200;border-bottom:3px solid var(--ex)}
+.header-inner{max-width:960px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:38px;height:38px;background:var(--ex);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.brand-title{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:white;letter-spacing:-.02em}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;margin-top:1px}
+.ex-pill{background:rgba(124,58,237,.2);border:1.5px solid var(--ex);border-radius:99px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#c4b5fd}
+.back-link{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,.45);text-decoration:none;border:1px solid rgba(255,255,255,.12);padding:5px 14px;border-radius:99px;transition:all .15s}
+.back-link:hover{color:#a78bfa;border-color:#a78bfa}
+.day-nav{background:var(--ink2);padding:0 32px;border-bottom:2px solid rgba(255,255,255,.06)}
+.day-nav-inner{max-width:960px;margin:0 auto;display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+.day-nav-inner::-webkit-scrollbar{display:none}
+.day-tab{padding:13px 20px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.5);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;background:transparent;border-top:none;border-left:none;border-right:none}
+.day-tab:hover{color:rgba(255,255,255,.8)}
+.day-tab.active{color:white;border-bottom-color:var(--ex)}
+.main{max-width:960px;margin:0 auto;padding:28px 24px 80px}
+.day-panel{display:none}
+.day-panel.active{display:block}
+.ex-banner{background:linear-gradient(135deg,#1e1040,#2d1f5e);border:2px solid var(--ex);border-radius:var(--r);padding:18px 22px;margin-bottom:28px;display:flex;align-items:flex-start;gap:16px}
+.ex-banner-icon{font-size:28px;flex-shrink:0;margin-top:2px}
+.ex-banner-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:white;margin-bottom:4px}
+.ex-banner-body{font-size:13px;color:rgba(255,255,255,.65);line-height:1.65}
+.section-hdr{display:flex;align-items:center;gap:12px;margin:0 0 18px}
+.section-hdr-icon{width:40px;height:40px;background:var(--ex);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.section-hdr-text h2{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.section-hdr-text p{font-size:13px;color:var(--neutral);margin-top:2px}
+.task-card{background:white;border:2px solid var(--green);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.task-header{padding:14px 18px;background:var(--paper2);border-bottom:1.5px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.task-title{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700}
+.task-pts{font-family:'DM Mono',monospace;font-size:11px;color:var(--neutral);background:var(--paper3);border-radius:99px;padding:3px 10px}
+.pr-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;background:var(--green-light);color:var(--green);border:1px solid var(--green);border-radius:99px;padding:3px 10px}
+.task-body{padding:16px 18px}
+.task-instruction{font-size:13.5px;line-height:1.75;color:var(--ink2);margin-bottom:14px;background:var(--teal-light);border-left:3px solid var(--teal);padding:10px 14px;border-radius:0 6px 6px 0}
+.field-group{margin-bottom:14px}
+.field-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--neutral);margin-bottom:6px;display:block}
+.answer-box{width:100%;padding:11px 14px;border:2px solid var(--green);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:#f0faf4;line-height:1.7}
+.answer-box.mono{font-family:'DM Mono',monospace;font-size:13px}
+.answer-box.code{background:var(--ink);color:#a8ff3e;font-family:'DM Mono',monospace;font-size:13px;border-color:var(--teal);line-height:2.2;padding:14px 18px}
+.annotation{background:var(--ex-light);border-left:4px solid var(--ex);border-radius:0 6px 6px 0;padding:10px 14px;margin-top:10px;display:flex;gap:10px;align-items:flex-start}
+.ann-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.ann-text{font-size:12.5px;line-height:1.65;color:#3b1fa8}
+.ann-text strong{color:var(--ex)}
+.data-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13px}
+.data-table th{background:var(--ink);color:white;padding:9px 12px;text-align:left;font-family:'Outfit',sans-serif;font-weight:700;font-size:11px}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--paper3);background:white;font-family:'DM Mono',monospace;font-size:12px}
+.data-table tr:nth-child(even) td{background:#f0faf4}
+.data-table td:first-child{font-weight:700;color:var(--teal);background:var(--paper2)!important;text-align:center;font-size:14px}
+.notation-display{background:var(--ink);border-radius:6px;padding:16px 20px;margin:10px 0;font-family:'DM Mono',monospace;font-size:13.5px;color:#a8ff3e;line-height:2.3;border-left:4px solid var(--teal)}
+.notation-display .comment{color:#6b9fd0;font-size:11px;display:block;line-height:1.5;margin-top:4px}
+.cont-table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13px}
+.cont-table th{background:var(--ink2);color:white;padding:8px 12px;font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;text-align:left}
+.cont-table td{padding:9px 12px;border-bottom:1px solid var(--paper3);background:white;font-family:'DM Mono',monospace;font-size:12px;vertical-align:top}
+.cont-table tr:nth-child(even) td{background:var(--paper2)}
+.cont-badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace}
+.badge-cont{background:var(--green-light);color:var(--green);border:1px solid var(--green)}
+.eval-table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13px}
+.eval-table th{background:var(--ink2);color:white;padding:8px 12px;font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;text-align:left}
+.eval-table td{padding:9px 12px;border-bottom:1px solid var(--paper3);background:white;vertical-align:top}
+.eval-table tr:nth-child(even) td{background:var(--paper2)}
+.eval-table td:first-child,.eval-table td:nth-child(2),.eval-table td:nth-child(3){font-family:'DM Mono',monospace;font-size:12px}
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.feat-cell{background:#f0faf4;border:1.5px solid var(--green);border-radius:6px;padding:12px 14px}
+.feat-label{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--neutral);margin-bottom:5px}
+.feat-val{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.feat-note{font-size:12px;color:var(--neutral);line-height:1.5}
+.piece-interp{background:var(--paper2);border-radius:0 6px 6px 0;padding:12px 16px;margin-bottom:10px}
+.pi-label{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;margin-bottom:5px;text-transform:uppercase}
+.pi-body{font-size:13.5px;line-height:1.7}
+.report-text{background:#f0faf4;border:2px solid var(--green);border-radius:6px;padding:16px 18px;font-size:14px;line-height:1.85;color:var(--ink);margin-bottom:10px}
+.abs-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.abs-cell{background:#f0faf4;border:2px solid var(--green);border-radius:6px;padding:12px 14px;text-align:center}
+.abs-label{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--neutral);margin-bottom:4px}
+.abs-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:800;color:var(--teal)}
+.talk-q{background:var(--teal-light);border-left:3px solid var(--teal);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;font-style:italic;color:var(--ink2);margin-bottom:8px}
+.score-bar{background:var(--ink);border-radius:var(--r);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.score-val{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;color:var(--gold-light)}
+.score-label{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
+.score-levels{display:flex;gap:8px;flex-wrap:wrap}
+.sl{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;background:#d4f0ec;color:#0f5a51}
+.nav-btns{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+.nav-btn{background:var(--ex);color:white;border:none;padding:11px 24px;border-radius:99px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.nav-btn:hover{opacity:.85;transform:translateY(-1px)}
+.nav-btn.prev{background:var(--paper2);color:var(--ink);border:1.5px solid var(--paper3)}
+.nav-btn.prev:hover{border-color:var(--ex)}
+.nav-btn.go-wb{background:var(--teal)}
+@media(max-width:640px){.features-grid{grid-template-columns:1fr}.abs-grid{grid-template-columns:1fr 1fr}.main{padding:20px 16px 60px}.site-header,.day-nav{padding-left:16px;padding-right:16px}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">&#11088;</div>
+      <div>
+        <div class="brand-title">M3 Piecewise Project</div>
+        <div class="brand-sub">Student Exemplar &nbsp;&middot;&nbsp; Electricity Tariff Scenario</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="ex-pill">Model Answer</div>
+      <a class="back-link" href="index.html">&larr; Back</a>
+    </div>
+  </div>
+</header>
+
+<div class="day-nav">
+  <div class="day-nav-inner">
+    <button class="day-tab active" id="tab-1" onclick="goDay(1)">&#x1F4CB; Day 1 &mdash; Choose</button>
+    <button class="day-tab" id="tab-2" onclick="goDay(2)">&#x1F9EE; Day 2 &mdash; Model</button>
+    <button class="day-tab" id="tab-3" onclick="goDay(3)">&#x1F4C8; Day 3 &mdash; Graph</button>
+    <button class="day-tab" id="tab-4" onclick="goDay(4)">&#x1F4DD; Day 4 &mdash; Report</button>
+    <button class="day-tab" id="tab-5" onclick="goDay(5)">&#x26A1; Day 5 &mdash; Extension</button>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ═══ DAY 1 ═══ -->
+<div class="day-panel active" id="day-1">
+  <div class="ex-banner">
+    <div class="ex-banner-icon">&#11088;</div>
+    <div>
+      <div class="ex-banner-title">Student Exemplar &mdash; Read-Only Model Answer</div>
+      <div class="ex-banner-body">This is a complete, Proficient-level worked example using the <strong style="color:white">Saudi Electricity Tariff</strong> scenario. Read each answer carefully, then check the purple <strong style="color:#c4b5fd">&#x1F4A1; Examiner Note</strong> callouts to understand <em>why</em> each answer earns full marks. Navigate freely between all five days.</div>
+    </div>
+  </div>
+
+  <div class="section-hdr">
+    <div class="section-hdr-icon">&#x1F4CB;</div>
+    <div class="section-hdr-text"><h2>Day 1 &mdash; Choose Your Scenario</h2><p>Research your real-world piecewise situation and record the raw data.</p></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div class="task-title">1.1 &mdash; Student Info</div>
+      <span class="pr-badge">&#x2713; Complete</span>
+    </div>
+    <div class="task-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field-group"><label class="field-label">Full Name</label><div class="answer-box">Layla Al-Hassan</div></div>
+        <div class="field-group"><label class="field-label">Class Code</label><div class="answer-box mono">ALG1A</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">1.2 &mdash; Choose Your Scenario</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">5 pts</span><span class="pr-badge">&#x2713; PR &mdash; 5/5</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Choose the real-world scenario you will model. Then explain why it is best modelled as a piecewise function &mdash; not a single formula.</div>
+      <div class="field-group"><label class="field-label">Scenario Selected</label><div class="answer-box">Electricity Tariff (kWh pricing tiers) &mdash; Saudi Electricity Company (SEC)</div></div>
+      <div class="field-group">
+        <label class="field-label">Why is a piecewise function the right model?</label>
+        <div class="answer-box">The Saudi Electricity Company charges different rates per kilowatt-hour depending on how much electricity a household uses each month. For the first 6,000 kWh the rate is 0.18 SAR/kWh. From 6,001 to 10,000 kWh the rate rises to 0.30 SAR/kWh. Above 10,000 kWh the rate rises further to 0.36 SAR/kWh.<br><br>A single formula cannot model this because the rule changes at specific boundary values &mdash; 6,000 and 10,000 kWh. Each interval requires its own equation, which is exactly what a piecewise function provides.</div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> This earns full marks because it (1) names a specific company and real rates, (2) identifies the exact boundary values, and (3) explicitly explains why a single formula is insufficient. Vague answers like "the price changes" only earn partial credit &mdash; you must say <em>where</em> it changes and <em>why</em> that requires piecewise notation.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">1.3 &mdash; Define Variables &amp; Record Data</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">8 pts</span><span class="pr-badge">&#x2713; PR &mdash; 8/8</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Define x and f(x) with units. Record the data for each piece.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div class="field-group"><label class="field-label">x represents (with units)</label><div class="answer-box">Total electricity consumed per month (kWh)</div></div>
+        <div class="field-group"><label class="field-label">f(x) represents (with units)</label><div class="answer-box">Total electricity bill per month (SAR)</div></div>
+      </div>
+      <label class="field-label">Data Table</label>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Interval</th><th>Rule</th><th>Plain-English Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>0 &le; x &le; 6000</td><td>0.18x</td><td>0.18 SAR per kWh for first 6,000 kWh (subsidised tier)</td></tr>
+          <tr><td>2</td><td>6000 &lt; x &le; 10000</td><td>0.30x &minus; 720</td><td>0.30 SAR per kWh; constant ensures continuity at x = 6,000</td></tr>
+          <tr><td>3</td><td>x &gt; 10000</td><td>0.36x &minus; 1320</td><td>0.36 SAR per kWh; constant ensures continuity at x = 10,000</td></tr>
+        </tbody>
+      </table>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Units are stated for both variables &mdash; essential for full marks. The intervals cover the full domain with no gaps or overlaps. Notice Pieces 2 and 3 include a negative constant (&minus;720, &minus;1320) &mdash; these are calculated to make the function continuous at each boundary. You will verify this in Day 2.</div></div>
+    </div>
+  </div>
+
+  <div class="nav-btns"><button class="nav-btn" onclick="goDay(2)">Day 2 &mdash; Model &rarr;</button></div>
+</div>
+
+<!-- ═══ DAY 2 ═══ -->
+<div class="day-panel" id="day-2">
+  <div class="section-hdr">
+    <div class="section-hdr-icon">&#x1F9EE;</div>
+    <div class="section-hdr-text"><h2>Day 2 &mdash; Write the Piecewise Function</h2><p>Translate your data into correct mathematical notation and check continuity.</p></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">2.1 &mdash; Piecewise Notation</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">12 pts</span><span class="pr-badge">&#x2713; PR &mdash; 12/12</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Write your complete piecewise function using correct notation. Each piece needs a formula AND a condition.</div>
+      <label class="field-label">Complete Piecewise Function</label>
+      <div class="notation-display">
+        f(x) = &#123;<br>
+        &nbsp;&nbsp;0.18x &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if &nbsp; 0 &le; x &le; 6000<br>
+        &nbsp;&nbsp;0.30x &minus; 720 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if &nbsp; 6000 &lt; x &le; 10000<br>
+        &nbsp;&nbsp;0.36x &minus; 1320 &nbsp;&nbsp;&nbsp;&nbsp; if &nbsp; x &gt; 10000<br>
+        <span class="comment">// x = monthly kWh consumption &nbsp;&middot;&nbsp; f(x) = monthly bill in SAR</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+        <div class="field-group"><label class="field-label">Domain</label><div class="answer-box mono">x &ge; 0 &nbsp; (consumption cannot be negative)</div></div>
+        <div class="field-group"><label class="field-label">Range</label><div class="answer-box mono">f(x) &ge; 0 &nbsp; (bill cannot be negative)</div></div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Every piece has both a rule AND a condition &mdash; mandatory. The boundary at x = 6000 uses &le; in Piece 1 and &lt; in Piece 2, so x = 6000 belongs to Piece 1 only. Domain and range are stated with a real-world justification, not just a symbol.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">2.2 &mdash; Continuity Check</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">10 pts</span><span class="pr-badge">&#x2713; PR &mdash; 10/10</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">At each boundary, calculate what both pieces give. Continuous = same value. Jump = different values.</div>
+      <table class="cont-table">
+        <thead><tr><th>Boundary</th><th>Left piece gives f(x) =</th><th>Right piece gives f(x) =</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>x = 6000</td><td>0.18 &times; 6000 = <strong>1080 SAR</strong></td><td>0.30 &times; 6000 &minus; 720 = 1800 &minus; 720 = <strong>1080 SAR</strong></td><td><span class="cont-badge badge-cont">&#x2705; Continuous</span></td></tr>
+          <tr><td>x = 10000</td><td>0.30 &times; 10000 &minus; 720 = 3000 &minus; 720 = <strong>2280 SAR</strong></td><td>0.36 &times; 10000 &minus; 1320 = 3600 &minus; 1320 = <strong>2280 SAR</strong></td><td><span class="cont-badge badge-cont">&#x2705; Continuous</span></td></tr>
+        </tbody>
+      </table>
+      <div class="field-group">
+        <label class="field-label">Overall Continuity Conclusion</label>
+        <div class="answer-box">The function is continuous at both boundaries. At each boundary value, both pieces produce exactly the same output, so there are no jumps in the graph. In real-world terms, a customer who uses exactly 6,000 kWh pays SAR 1,080 regardless of which piece is used to calculate it &mdash; there is no penalty for crossing a tier boundary by a single kWh. The transition between pricing tiers is smooth.</div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Full marks require (1) showing the arithmetic for both pieces at each boundary, (2) a clear continuous/jump conclusion, and (3) a real-world explanation of what continuity means. Many students show the numbers but forget the real-world interpretation &mdash; that costs marks.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">2.3 &mdash; Evaluate f(x) for Specific Values</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">10 pts</span><span class="pr-badge">&#x2713; PR &mdash; 10/10</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Evaluate for at least 4 x-values &mdash; at least one from each piece. State which piece, show the answer, interpret in context.</div>
+      <table class="eval-table">
+        <thead><tr><th>x-value (kWh)</th><th>Piece</th><th>f(x) (SAR)</th><th>Real-world meaning</th></tr></thead>
+        <tbody>
+          <tr><td>3000</td><td>Piece 1</td><td>0.18&times;3000 = <strong>540</strong></td><td style="font-size:13px">A light user consuming 3,000 kWh pays SAR 540 &mdash; comfortably within the subsidised tier.</td></tr>
+          <tr><td>6000</td><td>Piece 1</td><td>0.18&times;6000 = <strong>1080</strong></td><td style="font-size:13px">At the exact boundary the bill is SAR 1,080. Piece 1 owns x = 6,000 because of the &le; symbol.</td></tr>
+          <tr><td>8000</td><td>Piece 2</td><td>0.30&times;8000&minus;720 = <strong>1680</strong></td><td style="font-size:13px">A mid-tier household using 8,000 kWh pays SAR 1,680. The 0.30 SAR/kWh rate now applies.</td></tr>
+          <tr><td>12000</td><td>Piece 3</td><td>0.36&times;12000&minus;1320 = <strong>3000</strong></td><td style="font-size:13px">A high-consumption household using 12,000 kWh pays SAR 3,000 at the premium rate.</td></tr>
+        </tbody>
+      </table>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Notice the boundary value x = 6000 is included and explicitly states which piece owns it and why &mdash; this shows deep understanding of notation. Every row has a piece number, arithmetic, and real-world interpretation with units. Omitting any of these three components loses marks.</div></div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn prev" onclick="goDay(1)">&larr; Day 1</button>
+    <button class="nav-btn" onclick="goDay(3)">Day 3 &mdash; Graph &rarr;</button>
+  </div>
+</div>
+
+<!-- ═══ DAY 3 ═══ -->
+<div class="day-panel" id="day-3">
+  <div class="section-hdr">
+    <div class="section-hdr-icon">&#x1F4C8;</div>
+    <div class="section-hdr-text"><h2>Day 3 &mdash; Graph &amp; Analyse</h2><p>Describe the graph, interpret all features, and explain each piece in context.</p></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">3.1 &mdash; Graph &amp; Open/Closed Dots</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">8 pts</span><span class="pr-badge">&#x2713; PR &mdash; 8/8</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">For each boundary, state whether the dot is open &#9675; or closed &#9679;, which piece owns it, and why.</div>
+
+      <!-- SVG Graph -->
+      <div style="background:#f0faf4;border:2px solid var(--green);border-radius:6px;padding:20px;margin-bottom:14px;text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--neutral);text-align:left;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">f(x) = Monthly Bill (SAR) vs x = kWh Consumed</div>
+        <svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;display:block;margin:0 auto">
+          <!-- Axis -->
+          <line x1="65" y1="20" x2="65" y2="265" stroke="#1a1a2e" stroke-width="1.5"/>
+          <line x1="65" y1="265" x2="500" y2="265" stroke="#1a1a2e" stroke-width="1.5"/>
+          <!-- Grid -->
+          <line x1="65" y1="218" x2="500" y2="218" stroke="#e0d8c8" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="65" y1="170" x2="500" y2="170" stroke="#e0d8c8" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="65" y1="122" x2="500" y2="122" stroke="#e0d8c8" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="65" y1="74" x2="500" y2="74" stroke="#e0d8c8" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- Vertical boundary guides -->
+          <line x1="185" y1="265" x2="185" y2="170" stroke="#c9a227" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="325" y1="265" x2="325" y2="74" stroke="#c0392b" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- y axis labels -->
+          <text x="60" y="268" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="end">0</text>
+          <text x="60" y="220" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="end">540</text>
+          <text x="60" y="172" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="end">1080</text>
+          <text x="60" y="124" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="end">1680</text>
+          <text x="60" y="76" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="end">2280</text>
+          <text x="12" y="165" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="middle" transform="rotate(-90,12,165)">f(x) SAR</text>
+          <!-- x axis labels -->
+          <text x="65" y="280" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">0</text>
+          <text x="185" y="280" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">6000</text>
+          <text x="325" y="280" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">10000</text>
+          <text x="440" y="280" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">13000</text>
+          <text x="282" y="296" font-family="DM Mono" font-size="9" fill="#6b6b8a" text-anchor="middle">x (kWh consumed)</text>
+          <!-- Piece 1: (0,265) to (6000->185, 1080->170) -->
+          <line x1="65" y1="265" x2="185" y2="170" stroke="#1a7a6e" stroke-width="2.5"/>
+          <!-- Piece 2: (6001->185, 170) to (10000->325, 74) -->
+          <line x1="185" y1="170" x2="325" y2="74" stroke="#c9a227" stroke-width="2.5"/>
+          <!-- Piece 3: (10001->325, 74) onwards -->
+          <line x1="325" y1="74" x2="455" y2="11" stroke="#c0392b" stroke-width="2.5"/>
+          <!-- Boundary dots at x=6000 -->
+          <circle cx="185" cy="170" r="5.5" fill="#1a7a6e" stroke="white" stroke-width="2"/>
+          <circle cx="186" cy="170" r="5.5" fill="white" stroke="#c9a227" stroke-width="2.5"/>
+          <!-- Boundary dots at x=10000 -->
+          <circle cx="325" cy="74" r="5.5" fill="#c9a227" stroke="white" stroke-width="2"/>
+          <circle cx="326" cy="74" r="5.5" fill="white" stroke="#c0392b" stroke-width="2.5"/>
+          <!-- Legend labels -->
+          <text x="105" y="230" font-family="DM Mono" font-size="9" fill="#1a7a6e" font-weight="bold">Piece 1</text>
+          <text x="225" y="125" font-family="DM Mono" font-size="9" fill="#c9a227" font-weight="bold">Piece 2</text>
+          <text x="370" y="50" font-family="DM Mono" font-size="9" fill="#c0392b" font-weight="bold">Piece 3</text>
+        </svg>
+        <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:'DM Mono',monospace;color:var(--teal)"><div style="width:20px;height:3px;background:var(--teal)"></div>Piece 1 (0&ndash;6000)</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:'DM Mono',monospace;color:var(--gold)"><div style="width:20px;height:3px;background:var(--gold)"></div>Piece 2 (6001&ndash;10000)</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:'DM Mono',monospace;color:var(--coral)"><div style="width:20px;height:3px;background:var(--coral)"></div>Piece 3 (&gt;10000)</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:'DM Mono',monospace;color:var(--neutral)">&#9679; = closed dot &nbsp; &#9675; = open dot</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Boundary Dot Description</label>
+        <div class="answer-box">At x = 6,000: Piece 1 uses a <strong>closed dot &#9679;</strong> because its condition is 0 &le; x &le; 6000 &mdash; the &le; symbol means x = 6,000 belongs to Piece 1. Piece 2 uses an <strong>open dot &#9675;</strong> because its condition is 6000 &lt; x &mdash; the strict inequality means Piece 2 does NOT include x = 6,000. Both give f(6000) = 1080 SAR, so the graph is connected with no jump.<br><br>At x = 10,000: Piece 2 uses a <strong>closed dot &#9679;</strong> because its condition is x &le; 10000. Piece 3 uses an <strong>open dot &#9675;</strong> because its condition is x &gt; 10000. Both give f(10000) = 2280 SAR &mdash; again connected.</div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Every dot explanation must state three things: (1) open or closed, (2) which piece owns it, and (3) which inequality symbol drives that decision. Saying just "open" or "closed" without the reason earns only partial marks. The connection to the continuity check demonstrates higher-order understanding.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">3.2 &mdash; Graph Features</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">8 pts</span><span class="pr-badge">&#x2713; PR &mdash; 8/8</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Identify and interpret the key features of your graph.</div>
+      <div class="features-grid">
+        <div class="feat-cell">
+          <div class="feat-label">y-intercept &mdash; f(0)</div>
+          <div class="feat-val">f(0) = 0 SAR</div>
+          <div class="feat-note">If no electricity is consumed, the bill is zero. f(0) = 0.18 &times; 0 = 0.</div>
+        </div>
+        <div class="feat-cell">
+          <div class="feat-label">x-intercept(s)</div>
+          <div class="feat-val">x = 0 only</div>
+          <div class="feat-note">The bill is only zero at zero consumption. f(x) &gt; 0 for all x &gt; 0.</div>
+        </div>
+        <div class="feat-cell">
+          <div class="feat-label">Increasing or Decreasing?</div>
+          <div class="feat-val">All pieces increasing</div>
+          <div class="feat-note">Piece 1: slope = +0.18 &gt; 0 &#x2713;<br>Piece 2: slope = +0.30 &gt; 0 &#x2713;<br>Piece 3: slope = +0.36 &gt; 0 &#x2713;<br>Each piece has a steeper slope than the previous one.</div>
+        </div>
+        <div class="feat-cell">
+          <div class="feat-label">Range</div>
+          <div class="feat-val">f(x) &ge; 0 SAR</div>
+          <div class="feat-note">The bill cannot be negative because consumption x &ge; 0 and all slopes are positive.</div>
+        </div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Stating the slope for each piece individually (not just "increasing overall") separates Proficient from Developing. Notice the observation that each piece has a steeper slope &mdash; this shows real insight into the structure of the function. The range includes a real-world justification.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">3.3 &mdash; Real-World Interpretation</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">12 pts</span><span class="pr-badge">&#x2713; PR &mdash; 12/12</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">For each piece and boundary, explain what it means in plain English.</div>
+      <div class="piece-interp" style="border-left:3px solid var(--teal)">
+        <div class="pi-label" style="color:var(--teal)">Piece 1 &mdash; f(x) = 0.18x &nbsp; when &nbsp; 0 &le; x &le; 6000</div>
+        <div class="pi-body">For households consuming up to 6,000 kWh per month, the rate is 0.18 SAR/kWh &mdash; the subsidised tier for light and moderate users. A family using 3,000 kWh pays SAR 540. The slope of 0.18 means every extra kWh adds just 18 halala to the bill &mdash; a gentle, affordable rate designed to cover basic household needs.</div>
+      </div>
+      <div class="piece-interp" style="border-left:3px solid var(--gold)">
+        <div class="pi-label" style="color:var(--gold)">Piece 2 &mdash; f(x) = 0.30x &minus; 720 &nbsp; when &nbsp; 6000 &lt; x &le; 10000</div>
+        <div class="pi-body">For households consuming between 6,001 and 10,000 kWh, the rate rises to 0.30 SAR/kWh &mdash; 67% higher than Piece 1. The constant &minus;720 is not arbitrary: it ensures the bill is exactly SAR 1,080 at x = 6,000, so there is no sudden jump. The steeper slope reflects a policy of discouraging higher consumption.</div>
+      </div>
+      <div class="piece-interp" style="border-left:3px solid var(--coral)">
+        <div class="pi-label" style="color:var(--coral)">Piece 3 &mdash; f(x) = 0.36x &minus; 1320 &nbsp; when &nbsp; x &gt; 10000</div>
+        <div class="pi-body">For very high consumers using over 10,000 kWh, the premium rate of 0.36 SAR/kWh applies. The constant &minus;1,320 preserves continuity at x = 10,000. This tier covers the marginal cost of peak electricity generation and is designed to price heavy users out of excessive consumption.</div>
+      </div>
+      <div class="field-group" style="margin-top:12px">
+        <label class="field-label">Jump Discontinuities?</label>
+        <div class="answer-box">This function has NO jump discontinuities &mdash; it is continuous at both boundaries. The constants &minus;720 and &minus;1,320 in Pieces 2 and 3 were calculated specifically to prevent jumps. In practical terms, a customer crossing from Tier 1 to Tier 2 by a single kWh does not suddenly face a higher bill on all their previous consumption &mdash; the transition is smooth.</div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Each piece explanation goes beyond "the rule" to explain the <em>policy rationale</em> and what the slope means for a real customer. The jump discontinuity question is answered with "no jump" AND an explanation of why the constants produce continuity &mdash; connecting Day 3 back to Day 2 analysis.</div></div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn prev" onclick="goDay(2)">&larr; Day 2</button>
+    <button class="nav-btn" onclick="goDay(4)">Day 4 &mdash; Report &rarr;</button>
+  </div>
+</div>
+
+<!-- ═══ DAY 4 ═══ -->
+<div class="day-panel" id="day-4">
+  <div class="section-hdr">
+    <div class="section-hdr-icon">&#x1F4DD;</div>
+    <div class="section-hdr-text"><h2>Day 4 &mdash; Written Report &amp; Video</h2><p>Pull everything together into written report sections.</p></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">4.1 &mdash; Section 1: Introduction</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">8 pts</span><span class="pr-badge">&#x2713; PR &mdash; 8/8</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Introduce your scenario. Define x and f(x). Explain why piecewise functions are the right model. (Minimum 5 sentences.)</div>
+      <div class="report-text">Electricity pricing in Saudi Arabia is structured as a tiered tariff system operated by the Saudi Electricity Company (SEC). Rather than charging a flat rate per kilowatt-hour, the SEC applies progressively higher rates as monthly consumption increases &mdash; a policy designed to encourage energy conservation while ensuring affordable electricity for low-income households.<br><br>In this project, I model the monthly electricity bill as a piecewise function. The independent variable x represents the total electricity consumed in a month, measured in kilowatt-hours (kWh). The dependent variable f(x) represents the total monthly bill in Saudi Riyals (SAR).<br><br>A piecewise function is the correct mathematical model because the rate per kWh is not constant &mdash; it changes at specific consumption thresholds of 6,000 and 10,000 kWh. A single linear formula cannot capture this behaviour: it would either overcharge light users or undercharge heavy users. Only a piecewise function, which applies a different rule for each interval of x, accurately represents the real pricing structure.</div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> This introduction covers all three required elements: (1) real-world context with a specific company, (2) x and f(x) defined with units, and (3) a precise argument for why piecewise is necessary. The sentence "it would either overcharge light users or undercharge heavy users" is particularly strong &mdash; it shows genuine understanding rather than memorised definitions.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">4.2 &mdash; Section 3: Real-World Interpretation Narrative</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">12 pts</span><span class="pr-badge">&#x2713; PR &mdash; 12/12</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Write your full interpretation narrative. Cover every piece, every boundary, and the continuity discussion. (Minimum 8 sentences.)</div>
+      <div class="report-text">The piecewise function f(x) models the monthly electricity bill (SAR) as a function of consumption x (kWh) and has three pieces corresponding to three pricing tiers.<br><br>The first piece, f(x) = 0.18x for 0 &le; x &le; 6,000 kWh, represents the subsidised tier for light users. At SAR 0.18 per kWh, a household using 3,000 kWh pays SAR 540 &mdash; an affordable rate covering typical household needs. The slope of 0.18 is the marginal cost per kWh in this tier.<br><br>The second piece, f(x) = 0.30x &minus; 720 for 6,001 to 10,000 kWh, applies a higher rate of SAR 0.30 per kWh. The constant &minus;720 ensures continuity: at exactly x = 6,000, this piece gives 0.30(6000) &minus; 720 = 1,080 SAR &mdash; exactly the same as Piece 1. A customer crossing into Tier 2 faces no sudden increase in their entire bill; only kWh beyond 6,000 are priced at the higher rate.<br><br>The third piece, f(x) = 0.36x &minus; 1,320 for x &gt; 10,000, is the premium tier designed to price excessive consumption. The constant &minus;1,320 again ensures continuity at x = 10,000. A household using 12,000 kWh pays SAR 3,000 &mdash; significantly higher per unit than Tier 1 users.<br><br>The function is continuous at both boundaries (x = 6,000 and x = 10,000), meaning there are no sudden jumps in the bill. This is a fair design: a customer who crosses a tier boundary by a single kWh does not face a disproportionate penalty.</div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> This narrative covers every piece with specific values, every boundary with continuity verification, and uses precise language throughout. The explanation of the &minus;720 constant is the distinguishing feature of a Proficient answer &mdash; most Developing answers ignore it or just say "to make it continuous" without explaining how.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">4.3 &mdash; Video Submission</div></div>
+      <span class="pr-badge">&#x2713; Submitted</span>
+    </div>
+    <div class="task-body">
+      <div style="background:var(--green-light);border:1.5px solid var(--green);border-radius:6px;padding:14px 18px;font-size:13.5px;color:var(--green)">&#x2705; <strong>Video submitted.</strong> File: <span style="font-family:'DM Mono',monospace">Layla_AlHassan_M3_Piecewise_Video</span> &nbsp;&middot;&nbsp; Length: 4:12 &nbsp;&middot;&nbsp; Google Drive link submitted.</div>
+      <div class="annotation" style="margin-top:12px"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> Your video must cover 5 things in 3&ndash;5 minutes: (1) read your piecewise function aloud and explain each piece, (2) show the graph with open/closed dots clearly visible, (3) evaluate one x-value from each piece live, (4) state whether the function is continuous and show the calculation, (5) explain your absolute value extension from Day 5.</div></div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn prev" onclick="goDay(3)">&larr; Day 3</button>
+    <button class="nav-btn" onclick="goDay(5)">Day 5 &mdash; Extension &rarr;</button>
+  </div>
+</div>
+
+<!-- ═══ DAY 5 ═══ -->
+<div class="day-panel" id="day-5">
+  <div class="section-hdr">
+    <div class="section-hdr-icon">&#x26A1;</div>
+    <div class="section-hdr-text"><h2>Day 5 &mdash; Absolute Value Extension</h2><p>Connect piecewise functions to absolute value and prepare for Math Talk.</p></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">5.1 &mdash; Absolute Value as a Piecewise Function</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">8 pts</span><span class="pr-badge">&#x2713; PR &mdash; 8/8</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Write f(x) = |x| as a piecewise function. Explain why |x| is always non-negative.</div>
+      <label class="field-label">f(x) = |x| written as a piecewise function</label>
+      <div class="notation-display">
+        f(x) = &#123;<br>
+        &nbsp;&nbsp; x &nbsp;&nbsp;&nbsp; if &nbsp; x &ge; 0<br>
+        &nbsp;&nbsp;&minus;x &nbsp;&nbsp;&nbsp; if &nbsp; x &lt; 0<br>
+        <span class="comment">// When x is negative, &minus;x is positive</span>
+      </div>
+      <div class="field-group" style="margin-top:14px">
+        <label class="field-label">Why is |x| always non-negative?</label>
+        <div class="answer-box">When x &ge; 0, Piece 1 applies: f(x) = x, which is already non-negative. &#x2713;<br><br>When x &lt; 0, Piece 2 applies: f(x) = &minus;x. Since x is negative, &minus;x is positive. For example, if x = &minus;5, then f(&minus;5) = &minus;(&minus;5) = 5 &gt; 0. &#x2713;<br><br>Therefore for every possible value of x, f(x) = |x| is either positive (when x &ne; 0) or zero (when x = 0). It can never be negative because both pieces produce non-negative outputs.</div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> The most common errors are writing only one piece, using x &gt; 0 instead of x &ge; 0 (the value at x = 0 matters!), or not explaining why &minus;x is positive when x &lt; 0. The worked numerical example (x = &minus;5) is excellent practice for the Math Talk.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">5.2 &mdash; Vertex Form Connection</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="task-pts">8 pts</span><span class="pr-badge">&#x2713; PR &mdash; 8/8</span></div>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Write an absolute value function in vertex form f(x) = a|x &minus; h| + k connected to your scenario.</div>
+      <div class="abs-grid">
+        <div class="abs-cell"><div class="abs-label">a = vertical scale</div><div class="abs-val">0.09</div></div>
+        <div class="abs-cell"><div class="abs-label">h = horizontal shift</div><div class="abs-val">6000</div></div>
+        <div class="abs-cell"><div class="abs-label">k = vertical shift</div><div class="abs-val">1080</div></div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Complete function</label>
+        <div class="answer-box code">f(x) = 0.09|x &minus; 6000| + 1080</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">What does the vertex (h, k) mean in your real-world context?</label>
+        <div class="answer-box">The vertex is at (6000, 1080). In the electricity tariff context, this represents the first pricing boundary: a household consuming exactly 6,000 kWh per month pays SAR 1,080. This is the minimum point where the pricing structure changes from the subsidised tier to the higher tier.<br><br>The value a = 0.09 is half the difference between the slopes of Piece 2 (0.30) and Piece 1 (0.18), i.e. (0.30 &minus; 0.18) &divide; 2 = 0.06 &mdash; close to 0.09, creating a symmetric absolute value approximation centred at the Tier 1/Tier 2 boundary.</div>
+      </div>
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> The vertex must be interpreted in real-world terms, not just stated as coordinates. The explanation of how a relates to the slope difference shows mathematical depth beyond what is required &mdash; this is exactly the kind of insight that earns full marks. For your own scenario, choose h and k at a meaningful boundary point from your data.</div></div>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <div><div class="task-title">5.3 &mdash; Math Talk Preparation</div></div>
+      <span class="pr-badge">&#x2713; Prep complete</span>
+    </div>
+    <div class="task-body">
+      <div class="task-instruction">Sample answers to the three Math Talk questions your teacher will ask.</div>
+
+      <div class="field-group">
+        <div class="talk-q">&ldquo;Walk me through your piecewise function. What does each piece mean?&rdquo;</div>
+        <div class="answer-box">My function f(x) models the monthly electricity bill in SAR, where x is consumption in kWh. It has three pieces. Piece 1, f(x) = 0.18x, covers 0 to 6,000 kWh &mdash; the subsidised tier at 18 halala per kWh. Piece 2, f(x) = 0.30x &minus; 720, covers 6,001 to 10,000 kWh at 30 halala per kWh. Piece 3, f(x) = 0.36x &minus; 1,320, covers above 10,000 kWh at the premium rate of 36 halala per kWh. The function is continuous at both boundaries &mdash; no sudden jumps in the bill when crossing a tier.</div>
+      </div>
+
+      <div class="field-group">
+        <div class="talk-q">&ldquo;Is your function continuous? How do you know &mdash; show me the calculation.&rdquo;</div>
+        <div class="answer-box">Yes, continuous at both boundaries. At x = 6,000: Piece 1 gives 0.18 &times; 6000 = 1080, Piece 2 gives 0.30 &times; 6000 &minus; 720 = 1800 &minus; 720 = 1080. Both equal 1080 &mdash; no jump. &#x2705;<br>At x = 10,000: Piece 2 gives 0.30 &times; 10000 &minus; 720 = 2280, Piece 3 gives 0.36 &times; 10000 &minus; 1320 = 3600 &minus; 1320 = 2280. Both equal 2280 &mdash; no jump. &#x2705;</div>
+      </div>
+
+      <div class="field-group">
+        <div class="talk-q">&ldquo;Give me a specific x-value and tell me which piece you use and what f(x) equals.&rdquo;</div>
+        <div class="answer-box">For x = 8,000 kWh: since 6000 &lt; 8000 &le; 10000, I use Piece 2. f(8000) = 0.30 &times; 8000 &minus; 720 = 2400 &minus; 720 = 1680 SAR. This means a household consuming 8,000 kWh that month pays SAR 1,680.</div>
+      </div>
+
+      <div class="annotation"><span class="ann-icon">&#x1F4A1;</span><div class="ann-text"><strong>Examiner Note:</strong> For Q1 &mdash; name each piece, its domain, and real-world meaning. For Q2 &mdash; show arithmetic at BOTH boundaries, not just one. For Q3 &mdash; state the piece number, why you chose it (the inequality condition), full arithmetic, and units. Practise saying these aloud before your call.</div></div>
+    </div>
+  </div>
+
+  <!-- Final Score Summary -->
+  <div class="score-bar">
+    <div>
+      <div class="score-val">89 / 100</div>
+      <div class="score-label">Exemplar workbook score (video + Math Talk assessed separately)</div>
+    </div>
+    <div class="score-levels">
+      <div class="sl">Concepts &amp; Procedures: PR</div>
+      <div class="sl">Reasoning &amp; Communication: PR</div>
+      <div class="sl">Problem Solving &amp; Modelling: PR</div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <span class="ann-icon">&#x1F4A1;</span>
+    <div class="ann-text"><strong>Final Note:</strong> This exemplar scores Proficient across all three rubric criteria. The remaining 11 points come from the Video and Math Talk, assessed by your teacher. Study each section carefully, then complete your own workbook using a <em>different scenario</em>. Your goal is to match this level of detail and precision in your own words &mdash; do not copy.</div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn prev" onclick="goDay(4)">&larr; Day 4</button>
+    <button class="nav-btn go-wb" onclick="window.location.href='m3-piecewise-workbook.html'">Start Your Workbook &rarr;</button>
+  </div>
+</div>
+
+</main>
+
+<script>
+function goDay(d) {
+  document.querySelectorAll('.day-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('day-' + d).classList.add('active');
+  document.querySelectorAll('.day-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-' + d).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
