@@ -285,11 +285,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <div class="task-body">
       <div class="field-group">
         <label class="field-label">Your Full Name</label>
-        <input class="field-input" id="student-name" type="text" placeholder="e.g. Sara Al-Ahmad" autocomplete="off">
+        <input class="field-input" id="student-name" type="text" placeholder="e.g. Sara Al-Ahmad" autocomplete="off"
+          onblur="onStudentInfoChange()">
       </div>
       <div class="field-group">
         <label class="field-label">Class Code</label>
-        <input class="field-input mono-input" id="class-code" type="text" placeholder="ALG1A" maxlength="8" style="text-transform:uppercase;max-width:160px">
+        <input class="field-input mono-input" id="class-code" type="text" placeholder="ALG1A" maxlength="8" style="text-transform:uppercase;max-width:160px"
+          onblur="onStudentInfoChange()">
         <span class="field-hint">Your teacher will share this with you</span>
       </div>
     </div>
@@ -978,7 +980,133 @@ function saveState() {
     STATE: STATE,
     values: collectAllValues()
   };
+  // Always save locally for instant restore on same device
   try { localStorage.setItem('m3pw_workbook_state', JSON.stringify(data)); } catch(e){}
+  // Push to Google Sheet on every save (if student info is filled)
+  var name = (document.getElementById('student-name')||{}).value || '';
+  var code = (document.getElementById('class-code')||{}).value || '';
+  if (name && code) {
+    pushToSheet(name, code, data);
+  }
+}
+
+// ── GOOGLE SHEETS BACKEND ──────────────────────────────────────
+// Replace SCRIPT_URL below with your deployed Apps Script Web App URL
+var SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+
+async function pushToSheet(name, code, data) {
+  if (!SCRIPT_URL || SCRIPT_URL.includes('PASTE_YOUR')) return;
+  try {
+    var payload = {
+      action: 'save',
+      name: name,
+      code: code,
+      savedAt: new Date().toISOString(),
+      totalScore: data.STATE.totalScore || 0,
+      currentDay: data.STATE.currentDay || 1,
+      daysComplete: Object.keys(data.STATE.dayComplete||{}).filter(function(d){ return data.STATE.dayComplete[d]; }).length,
+      scores: JSON.stringify(data.STATE.scores || {}),
+      submitted: JSON.stringify(data.STATE.submitted || {}),
+      rubricGrade: JSON.stringify(data.STATE.rubricGrade || {}),
+      scenario: (document.getElementById('scenario-choice')||{}).value || '',
+      videoLink: (document.getElementById('video-link')||{}).value || ''
+    };
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+}
+
+async function loadFromSheet(name, code) {
+  if (!SCRIPT_URL || SCRIPT_URL.includes('PASTE_YOUR')) return null;
+  try {
+    var url = SCRIPT_URL + '?action=load&name=' + encodeURIComponent(name) + '&code=' + encodeURIComponent(code);
+    var res = await fetch(url);
+    var json = await res.json();
+    return json && json.found ? json : null;
+  } catch(e) { return null; }
+}
+
+async function loadAllFromSheet(code) {
+  if (!SCRIPT_URL || SCRIPT_URL.includes('PASTE_YOUR')) return null;
+  try {
+    var url = SCRIPT_URL + '?action=loadAll&code=' + encodeURIComponent(code);
+    var res = await fetch(url);
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+async function loadStateFromServer(name, code) {
+  // 1. Try Google Sheet first
+  var remote = await loadFromSheet(name, code);
+  if (remote && remote.found) {
+    try {
+      var scores = JSON.parse(remote.scores || '{}');
+      var submitted = JSON.parse(remote.submitted || '{}');
+      var rubricGrade = JSON.parse(remote.rubricGrade || '{}');
+      Object.assign(STATE, {
+        totalScore: parseInt(remote.totalScore)||0,
+        currentDay: parseInt(remote.currentDay)||1,
+        scores: scores,
+        submitted: submitted,
+        rubricGrade: rubricGrade
+      });
+      // Rebuild dayComplete from submitted tasks
+      for (var d = 1; d <= 5; d++) {
+        var tasks = DAY_TASKS[d] || [];
+        var allDone = tasks.every(function(t){ return submitted[t] || t==='4-3' || t==='5-3'; });
+        if (allDone) STATE.dayComplete[d] = true;
+      }
+    } catch(e) {}
+  } else {
+    // 2. Fall back to localStorage
+    try {
+      var raw = localStorage.getItem('m3pw_workbook_state');
+      if (!raw) return false;
+      var data = JSON.parse(raw);
+      if (data.STATE) Object.assign(STATE, data.STATE);
+      if (data.values) {
+        Object.keys(data.values).forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.value = data.values[id];
+        });
+      }
+    } catch(e) { return false; }
+  }
+
+  updateScoreDisplay();
+  updateProgress();
+  STATE.unlockedDays = [1];
+  for (var d2 = 1; d2 <= 5; d2++) {
+    if (STATE.dayComplete[d2] || d2 === 1) unlockDay(d2);
+    if (STATE.dayComplete[d2-1] && d2 > 1) unlockDay(d2);
+  }
+  if (STATE.currentDay) {
+    document.querySelectorAll('.day-panel').forEach(function(p){ p.classList.remove('active'); });
+    var panel = document.getElementById('day-' + STATE.currentDay);
+    if (panel) panel.classList.add('active');
+    document.querySelectorAll('.day-tab').forEach(function(t){ t.classList.remove('active'); });
+    var tab = document.getElementById('tab-' + STATE.currentDay);
+    if (tab) tab.classList.add('active');
+  }
+  Object.keys(STATE.dayComplete).forEach(function(d) {
+    if (STATE.dayComplete[d]) {
+      var el = document.getElementById('complete-' + d);
+      if (el) el.classList.add('show');
+    }
+  });
+  Object.keys(STATE.submitted).forEach(function(task) {
+    if (STATE.submitted[task]) {
+      var card = document.getElementById('card-' + task);
+      if (card) card.classList.add('submitted');
+      var dot = document.getElementById('dot-' + task);
+      if (dot) { dot.classList.remove('amber','red'); dot.classList.add('green'); }
+    }
+  });
+  return true;
 }
 
 function collectAllValues() {
@@ -1619,6 +1747,8 @@ function updateScoreDisplay() {
 
 function markTaskDone(taskId) {
   STATE.submitted[taskId] = true;
+  // Save to server immediately on every task completion
+  saveState();
 }
 
 function checkDayComplete(taskId) {
@@ -1688,97 +1818,139 @@ function teacherLogin() {
   }
 }
 
-function showTeacherDashboard() {
+async function showTeacherDashboard() {
   document.getElementById('teacher-dashboard').style.display = 'block';
   document.getElementById('teacher-login-wrap').style.display = 'none';
 
-  var name = document.getElementById('student-name').value || '(no name yet)';
-  var code = document.getElementById('class-code').value || '—';
-  var score = STATE.totalScore;
-  var daysComplete = Object.keys(STATE.dayComplete).filter(function(d){ return STATE.dayComplete[d]; }).length;
-  var tasksComplete = Object.keys(STATE.submitted).filter(function(t){ return STATE.submitted[t]; }).length;
+  var classCode = (document.getElementById('class-code')||{}).value || 'ALG1A';
 
   document.getElementById('t-stats').innerHTML =
-    '<div class="t-stat"><div class="t-stat-val">' + name + '</div><div class="t-stat-lbl">Student</div></div>' +
-    '<div class="t-stat"><div class="t-stat-val">' + code + '</div><div class="t-stat-lbl">Class Code</div></div>' +
-    '<div class="t-stat"><div class="t-stat-val" style="color:var(--teal)">' + score + '/100</div><div class="t-stat-lbl">Current Score</div></div>' +
-    '<div class="t-stat"><div class="t-stat-val">' + daysComplete + '/5</div><div class="t-stat-lbl">Days Complete</div></div>';
+    '<div style="color:var(--neutral);font-family:DM Mono,monospace;font-size:12px;padding:12px;grid-column:1/-1">' +
+    '⏳ Loading student progress from Google Sheets...</div>';
+  document.getElementById('t-submissions').innerHTML = '';
 
-  var subHtml = '';
-  // Day by day breakdown
-  for (var d = 1; d <= 5; d++) {
-    var tasks = DAY_TASKS[d] || [];
-    var dayScore = tasks.reduce(function(acc, t){ return acc + (STATE.scores[t] || 0); }, 0);
-    var dayMax = tasks.reduce(function(acc, t){ return acc + (TASK_MAX[t] || 0); }, 0);
-    var status = STATE.dayComplete[d] ? 'done' : tasks.some(function(t){ return STATE.submitted[t]; }) ? 'partial' : 'missing';
-    subHtml += '<div class="submission-card">' +
-      '<div class="sub-header">' +
-      '<div><div class="sub-name">Day ' + d + ' — ' + ['Choose','Model','Graph','Report','Extension'][d-1] + '</div></div>' +
-      '<div style="display:flex;align-items:center;gap:10px">' +
-      '<span class="sub-score">' + dayScore + '/' + dayMax + ' pts</span>' +
-      '<span class="day-chip ' + status + '">' + (status==='done'?'✓ Complete':status==='partial'?'In Progress':'Not Started') + '</span>' +
-      '<button class="view-btn" onclick="toggleSubDetail(this,' + d + ')">Details</button>' +
-      '</div></div>' +
-      '<div class="sub-detail" id="sub-d' + d + '">' + buildDayDetail(d) + '</div></div>';
+  // Check if script URL is configured
+  if (!SCRIPT_URL || SCRIPT_URL.includes('PASTE_YOUR')) {
+    document.getElementById('t-stats').innerHTML =
+      '<div style="background:var(--amber-light);border:1.5px solid var(--amber);border-radius:6px;padding:16px;font-size:13px;color:var(--amber);grid-column:1/-1">' +
+      '⚠️ <strong>Setup required:</strong> Paste your Google Apps Script URL into the SCRIPT_URL variable in the workbook JS. ' +
+      'See the setup guide for instructions.</div>';
+    return;
   }
 
-  // Video + Math Talk
-  var videoLink = document.getElementById('video-link') ? document.getElementById('video-link').value : '';
-  var videoLen = document.getElementById('video-length') ? document.getElementById('video-length').value : '';
-  subHtml += '<div class="submission-card">' +
-    '<div class="sub-header"><div class="sub-name">📹 Video Submission</div>' +
-    '<div>' + (videoLink ? '<a href="' + videoLink + '" target="_blank" style="color:var(--teal);font-weight:700;font-size:13px">Open Video ↗</a>' : '<span style="color:var(--neutral);font-size:13px">Not submitted</span>') + '</div></div>' +
-    (videoLink ? '<div style="padding:8px 0;font-size:13px;color:var(--neutral)">Length: ' + (videoLen||'—') + '</div>' : '') +
-    '<div><label class="field-label" style="margin-top:8px">Teacher feedback on video</label>' +
-    '<textarea class="t-feedback-area" id="t-video-fb" placeholder="Write feedback for the student\'s video here..."></textarea>' +
-    '<button class="send-fb-btn" onclick="saveFeedback(\'video\')">Save Feedback</button></div></div>';
+  var allStudents = await loadAllFromSheet(classCode);
+  if (!allStudents || !allStudents.students) {
+    document.getElementById('t-stats').innerHTML =
+      '<div style="color:var(--neutral);font-family:DM Mono,monospace;font-size:12px;padding:12px;grid-column:1/-1">' +
+      'No submissions yet for class code: <strong>' + classCode + '</strong></div>';
+    return;
+  }
+
+  var students = allStudents.students;
+  students.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+
+  var total = students.length;
+  var done = students.filter(function(s){ return parseInt(s.daysComplete||0) >= 5; }).length;
+  var avgScore = total > 0 ? Math.round(students.reduce(function(acc,s){ return acc+(parseInt(s.totalScore||0)); },0)/total) : 0;
+  var inProgress = students.filter(function(s){ return parseInt(s.daysComplete||0) > 0 && parseInt(s.daysComplete||0) < 5; }).length;
+
+  document.getElementById('t-stats').innerHTML =
+    '<div class="t-stat"><div class="t-stat-val" style="font-size:22px">' + total + '</div><div class="t-stat-lbl">Students</div></div>' +
+    '<div class="t-stat"><div class="t-stat-val" style="font-size:22px;color:var(--teal)">' + done + '</div><div class="t-stat-lbl">Complete</div></div>' +
+    '<div class="t-stat"><div class="t-stat-val" style="font-size:22px;color:var(--amber)">' + inProgress + '</div><div class="t-stat-lbl">In Progress</div></div>' +
+    '<div class="t-stat"><div class="t-stat-val" style="font-size:22px;color:var(--gold)">' + avgScore + '<span style="font-size:14px;font-weight:400">/100</span></div><div class="t-stat-lbl">Avg Score</div></div>';
+
+  // Task labels for tooltips
+  var TASK_LABELS = {
+    '1-2':'Scenario','1-3':'Data','2-1':'Notation','2-2':'Continuity','2-3':'Evaluate',
+    '3-1':'Graph','3-2':'Features','3-3':'Interpretation','4-1':'Intro','4-2':'Narrative','5-1':'Abs Value','5-2':'Vertex'
+  };
+  var ALL_TASKS = ['1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3','4-1','4-2','5-1','5-2'];
+
+  // Progress grid header
+  var subHtml = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:700px">' +
+    '<thead><tr style="background:var(--ink);color:white">' +
+    '<th style="padding:10px 12px;text-align:left;font-family:Outfit,sans-serif;font-weight:700;min-width:140px">Student</th>' +
+    '<th style="padding:10px 8px;text-align:center;font-family:DM Mono,monospace;font-size:10px">Score</th>' +
+    '<th style="padding:10px 8px;text-align:center;font-family:DM Mono,monospace;font-size:10px">Day</th>';
+
+  // Task columns grouped by day
+  var DAY_COLOURS = ['#1a7a6e','#1a7a6e','#7c3aed','#7c3aed','#7c3aed','#c9a227','#c9a227','#c9a227','#c0392b','#c0392b','#2563eb','#2563eb'];
+  ALL_TASKS.forEach(function(t, i) {
+    subHtml += '<th style="padding:8px 4px;text-align:center;font-family:DM Mono,monospace;font-size:9px;color:' + DAY_COLOURS[i] + ';min-width:36px" title="' + TASK_LABELS[t] + '">' + t + '</th>';
+  });
+  subHtml += '<th style="padding:10px 8px;font-family:DM Mono,monospace;font-size:10px">Rubric</th>';
+  subHtml += '<th style="padding:10px 8px;font-family:DM Mono,monospace;font-size:10px">Last saved</th>';
+  subHtml += '</tr></thead><tbody>';
+
+  students.forEach(function(s, idx) {
+    var scores = {};
+    var submitted = {};
+    try { scores = JSON.parse(s.scores || '{}'); } catch(e) {}
+    try { submitted = JSON.parse(s.submitted || '{}'); } catch(e) {}
+    var rubric = {};
+    try { rubric = JSON.parse(s.rubricGrade || '{}'); } catch(e) {}
+
+    var daysComplete = parseInt(s.daysComplete||0);
+    var totalScore = parseInt(s.totalScore||0);
+    var rowBg = idx % 2 === 0 ? 'white' : 'var(--paper2)';
+    var statusColour = daysComplete >= 5 ? 'var(--green)' : daysComplete > 0 ? 'var(--amber)' : 'var(--neutral)';
+
+    subHtml += '<tr style="background:' + rowBg + ';border-bottom:1px solid var(--paper3)">' +
+      '<td style="padding:10px 12px;font-family:Outfit,sans-serif;font-weight:700;font-size:13px">' + (s.name||'—') + '</td>' +
+      '<td style="padding:8px;text-align:center;font-family:DM Mono,monospace;font-weight:700;color:var(--teal)">' + totalScore + '</td>' +
+      '<td style="padding:8px;text-align:center;font-family:DM Mono,monospace;font-size:11px;font-weight:700;color:' + statusColour + '">' +
+        (daysComplete >= 5 ? '✓ Done' : 'D' + (parseInt(s.currentDay||1))) + '</td>';
+
+    // Task cells — green check, amber dot, empty
+    ALL_TASKS.forEach(function(t) {
+      var isDone = submitted[t];
+      var pts = scores[t] || 0;
+      var max = TASK_MAX[t] || 0;
+      var pct = max > 0 ? pts/max : 0;
+      var cellBg = isDone ? (pct >= 0.8 ? '#d4f0e0' : pct >= 0.5 ? '#fef3c7' : '#fde8e6') : 'transparent';
+      var cellText = isDone ? (pct >= 0.8 ? '✓' : pts) : '·';
+      var cellColour = isDone ? (pct >= 0.8 ? 'var(--green)' : pct >= 0.5 ? 'var(--amber)' : 'var(--coral)') : 'var(--paper3)';
+      subHtml += '<td style="padding:6px 4px;text-align:center;background:' + cellBg + ';font-family:DM Mono,monospace;font-size:11px;font-weight:700;color:' + cellColour + '" title="' + TASK_LABELS[t] + ': ' + pts + '/' + max + ' pts">' + cellText + '</td>';
+    });
+
+    // Rubric
+    var LEVEL_COLOURS = { PR:'#0f5a51', DV:'#7a5c00', EM:'#7a1a12', NA:'#aaa' };
+    var rubricHtml = '';
+    if (rubric.cp) {
+      rubricHtml = '<span style="font-family:DM Mono,monospace;font-size:9px;font-weight:700;color:' + (LEVEL_COLOURS[rubric.cp]||'#aaa') + '">' + rubric.cp + '</span>' +
+        ' <span style="font-family:DM Mono,monospace;font-size:9px;color:' + (LEVEL_COLOURS[rubric.rc]||'#aaa') + '">' + (rubric.rc||'—') + '</span>' +
+        ' <span style="font-family:DM Mono,monospace;font-size:9px;color:' + (LEVEL_COLOURS[rubric.ps]||'#aaa') + '">' + (rubric.ps||'—') + '</span>';
+    } else {
+      rubricHtml = '<span style="color:var(--paper3);font-size:11px">—</span>';
+    }
+    subHtml += '<td style="padding:8px;white-space:nowrap">' + rubricHtml + '</td>';
+
+    // Last saved
+    var savedAt = s.savedAt ? new Date(s.savedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ' ' + new Date(s.savedAt).toLocaleDateString([], {day:'numeric',month:'short'}) : '—';
+    subHtml += '<td style="padding:8px;font-family:DM Mono,monospace;font-size:10px;color:var(--neutral)">' + savedAt + '</td>';
+    subHtml += '</tr>';
+  });
+
+  subHtml += '</tbody></table></div>';
+
+  // Legend
+  subHtml += '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-family:DM Mono,monospace;font-size:11px;color:var(--neutral)">' +
+    '<span>Task colours:</span>' +
+    '<span style="color:var(--green)">✓ Green = 80%+</span>' +
+    '<span style="color:var(--amber)">● Amber = 50–79%</span>' +
+    '<span style="color:var(--coral)">● Red = below 50%</span>' +
+    '<span>· = not yet submitted</span>' +
+    '<span style="color:var(--teal)">D1–D5 = current day</span>' +
+    '</div>' +
+    '<div style="margin-top:10px;font-family:DM Mono,monospace;font-size:11px;color:var(--neutral)">Rubric: C&amp;P · R&amp;C · PS&amp;M &nbsp;·&nbsp; ' +
+    '<button onclick="showTeacherDashboard()" style="background:none;border:1px solid var(--teal);color:var(--teal);border-radius:99px;padding:3px 12px;font-size:11px;cursor:pointer;font-family:DM Mono,monospace">↻ Refresh</button></div>';
 
   document.getElementById('t-submissions').innerHTML = subHtml;
-
-  // Rubric grade summary in teacher dashboard
-  if (STATE.rubricGrade) {
-    var rg = STATE.rubricGrade;
-    var LEVEL_COLOR = { PR:'#0f5a51', DV:'#7a5c00', EM:'#7a1a12', NA:'#6b6b8a' };
-    var LEVEL_BG    = { PR:'#d4f0ec', DV:'#fef9e7', EM:'#fde8e6', NA:'#ede7d9' };
-    var rgHtml = '<div class="t-section-title" style="margin-top:20px">📊 Auto Rubric Grade</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">';
-    [['cp','Concepts & Procedures'],['rc','Reasoning & Communication'],['ps','Problem Solving & Modelling']].forEach(function(pair) {
-      var key = pair[0], label = pair[1];
-      var level = rg[key], raw = rg[key+'_raw'], max = rg[key+'_max'];
-      rgHtml += '<div style="background:' + LEVEL_BG[level] + ';border-radius:var(--r);padding:14px;border:1.5px solid var(--paper3)">' +
-        '<div style="font-family:DM Mono,monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--neutral);margin-bottom:4px">' + label + '</div>' +
-        '<div style="font-family:Outfit,sans-serif;font-size:20px;font-weight:800;color:' + LEVEL_COLOR[level] + '">' + level + '</div>' +
-        '<div style="font-size:11px;color:var(--neutral);margin-top:3px;font-family:DM Mono,monospace">' + raw + '/' + max + ' pts</div></div>';
-    });
-    rgHtml += '</div>';
-    document.getElementById('teacher-dashboard').insertAdjacentHTML('beforeend', rgHtml);
-  }
-}
-
-function buildDayDetail(d) {
-  var tasks = DAY_TASKS[d] || [];
-  var html = '';
-  tasks.forEach(function(t) {
-    var score = STATE.scores[t] || 0;
-    var max = TASK_MAX[t] || 0;
-    var done = STATE.submitted[t];
-    html += '<div class="sub-field-row"><span class="sf-label">Task ' + t + '</span>' +
-      '<span class="sf-value">' + (done ? '✅ Submitted — ' + score + '/' + max + ' pts' : '○ Not submitted') + '</span></div>';
-  });
-  html += '<label class="field-label" style="margin-top:10px">Teacher note for Day ' + d + '</label>' +
-    '<textarea class="t-feedback-area" id="t-fb-d' + d + '" placeholder="Add a note or flag for this day..."></textarea>' +
-    '<button class="send-fb-btn" onclick="saveFeedback(\'d' + d + '\')">Save Note</button>';
-  return html;
-}
-
-function toggleSubDetail(btn, d) {
-  var el = document.getElementById('sub-d' + d);
-  el.classList.toggle('open');
-  btn.textContent = el.classList.contains('open') ? 'Hide' : 'Details';
 }
 
 function saveFeedback(key) {
-  showToast('Feedback saved for ' + key, '');
+  showToast('Feedback saved', '');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1944,12 +2116,20 @@ showTeacherDashboard = function() {
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-window.addEventListener('load', function() {
-  loadState();
-  updateProgress();
+window.addEventListener('load', async function() {
+  loadState(); // Restore local state immediately for fast load
   restoreUploads();
-  // Auto-save every 30 seconds
-  setInterval(saveState, 30000);
+
+  // Then try to pull latest from server (may have more recent data from another device)
+  var name = (document.getElementById('student-name')||{}).value || '';
+  var code = (document.getElementById('class-code')||{}).value || '';
+  if (name && code) {
+    var loaded = await loadStateFromServer(name, code);
+    if (loaded) showToast('Progress restored ✓', '');
+  }
+
+  // Auto-save every 60 seconds
+  setInterval(saveState, 60000);
 });
 
 // Close modal on overlay click
@@ -1964,6 +2144,20 @@ function confirmReset() {
       localStorage.removeItem('m3pw_state');
     } catch(e) {}
     window.location.reload();
+  }
+}
+
+async function onStudentInfoChange() {
+  var name = (document.getElementById('student-name')||{}).value || '';
+  var code = (document.getElementById('class-code')||{}).value || '';
+  if (!name || !code) return;
+  // Try to load existing progress for this student from server
+  var loaded = await loadStateFromServer(name, code);
+  if (loaded) {
+    showToast('Welcome back ' + name + ' — progress restored ✓', '');
+  } else {
+    // New student — save their info immediately
+    saveState();
   }
 }
 
