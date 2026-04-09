@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M3 Piecewise Functions Project — Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1a2e; --ink2:#2d2d4e;
+  --paper:#f5f0e8; --paper2:#ede7d9; --paper3:#e0d8c8;
+  --gold:#c9a227; --gold2:#e8b83a; --gold-light:#fef3c7;
+  --teal:#1a7a6e; --teal2:#25a898; --teal-light:#d4f0ec;
+  --coral:#c0392b;
+  --green:#1a7a3c; --green-light:#d4f0e0;
+  --amber:#d97706; --amber-light:#fef3c7;
+  --neutral:#6b6b8a;
+  --pw:#b45309; --pw2:#f59e0b; /* piecewise amber */
+  --pr-bg:#d4f0ec; --pr-fg:#0f5a51;
+  --dv-bg:#fef9e7; --dv-fg:#7a5c00;
+  --em-bg:#fde8e6; --em-fg:#7a1a12;
+  --na-bg:#ede7d9; --na-fg:#6b6b8a;
+  --r:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.site-header{background:var(--ink);padding:0 32px;position:sticky;top:0;z-index:200;border-bottom:4px solid var(--teal)}
+.header-inner{max-width:900px;margin:0 auto;height:62px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:13px}
+.brand-icon{width:42px;height:42px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.brand-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;color:white;letter-spacing:-.02em}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:10px}
+.code-pill{background:rgba(26,122,110,.2);border:1.5px solid var(--teal);border-radius:99px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#a7f3d0}
+.back-link{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,.45);text-decoration:none;border:1px solid rgba(255,255,255,.15);padding:5px 14px;border-radius:99px;transition:all .15s}
+.back-link:hover{color:var(--gold2);border-color:var(--gold2)}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--ink) 0%,#16213e 100%);padding:52px 32px 44px;text-align:center;border-bottom:3px solid var(--teal);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30 L30 0 L60 30 L30 60Z' fill='none' stroke='rgba(26,122,110,0.06)' stroke-width='1'/%3E%3C/svg%3E");opacity:1}
+.hero-inner{max-width:700px;margin:0 auto;position:relative}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.2em;color:var(--teal2);margin-bottom:16px}
+.hero-title{font-family:'Outfit',sans-serif;font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1;color:white;margin-bottom:12px}
+.hero-title span{color:var(--gold2)}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.55);line-height:1.75;max-width:540px;margin:0 auto 28px}
+.info-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:500px;margin:0 auto}
+.info-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:14px 16px;border-top:3px solid var(--teal)}
+.ic-label{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:5px}
+.ic-value{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:white}
+.ic-value.gold{color:var(--gold2)}
+
+/* ── NAV PILLS ── */
+.sticky-nav{background:var(--ink2);border-bottom:2px solid rgba(255,255,255,.06);position:sticky;top:62px;z-index:100}
+.sticky-nav-inner{max-width:900px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none;padding:0 24px}
+.sticky-nav-inner::-webkit-scrollbar{display:none}
+.nav-pill{padding:13px 18px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:rgba(255,255,255,.45);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;text-transform:uppercase;letter-spacing:.08em}
+.nav-pill:hover{color:rgba(255,255,255,.8)}
+.nav-pill.active{color:var(--teal2);border-bottom-color:var(--teal2)}
+
+/* ── MAIN ── */
+.main{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+
+/* ── SECTION BAR ── */
+.section-bar{background:var(--ink);color:white;border-radius:var(--r);padding:11px 18px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;margin:36px 0 18px;border-bottom:3px solid var(--teal);display:flex;align-items:center;gap:10px;scroll-margin-top:120px}
+.section-bar:first-child{margin-top:0}
+
+/* ── INTRO BOX ── */
+.intro-box{background:var(--teal-light);border-left:4px solid var(--teal);border-radius:0 var(--r) var(--r) 0;padding:18px 22px;margin-bottom:20px;font-size:14px;line-height:1.8;color:var(--ink)}
+.intro-box strong{color:var(--teal)}
+.intro-box p+p{margin-top:10px}
+
+/* ── GOALS ── */
+.goals-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.goal-item{display:flex;gap:14px;align-items:flex-start;background:white;border:1.5px solid var(--paper3);border-radius:var(--r);padding:13px 16px}
+.goal-num{width:28px;height:28px;background:var(--teal);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;margin-top:1px}
+.goal-text{font-size:14px;line-height:1.65;color:var(--ink)}
+.goal-text strong{color:var(--teal)}
+
+/* ── FIVE-DAY PLAN ── */
+.day-list{display:flex;flex-direction:column;gap:0;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;box-shadow:4px 4px 0 var(--ink)}
+.day-row{display:flex;align-items:stretch;border-bottom:1.5px solid var(--paper3)}
+.day-row:last-child{border-bottom:none}
+.day-num-col{background:var(--ink);color:white;padding:16px 14px;min-width:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-right:3px solid var(--teal);flex-shrink:0}
+.day-label{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);margin-bottom:3px}
+.day-name{font-family:'Outfit',sans-serif;font-weight:800;font-size:13px;color:white;line-height:1.2}
+.day-body{padding:14px 18px;flex:1;background:white;display:flex;flex-direction:column;justify-content:center}
+.day-body:nth-child(2){background:var(--paper2)}
+.day-desc{font-size:13.5px;line-height:1.65;color:var(--ink2);margin-bottom:8px}
+.day-deliverables{display:flex;gap:6px;flex-wrap:wrap}
+.deliv-tag{font-family:'DM Mono',monospace;font-size:9px;background:var(--teal-light);border:1px solid var(--teal);color:var(--teal);border-radius:99px;padding:2px 9px;font-weight:500}
+
+/* ── SCENARIOS ── */
+.scenario-grid{display:flex;flex-direction:column;gap:8px}
+.scenario-card{display:flex;align-items:stretch;background:white;border:1.5px solid var(--paper3);border-radius:var(--r);overflow:hidden}
+.scenario-left{background:var(--paper2);padding:14px 16px;min-width:140px;max-width:140px;border-right:3px solid var(--gold);display:flex;flex-direction:column;justify-content:center}
+.scenario-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:3px;line-height:1.2}
+.scenario-type{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.scenario-right{padding:13px 16px;font-size:13.5px;line-height:1.65;color:var(--ink2);flex:1;display:flex;align-items:center}
+
+/* ── DELIVERABLES ── */
+.deliv-list{display:flex;flex-direction:column;gap:10px}
+.deliv-card{background:white;border:2px solid var(--paper3);border-radius:var(--r);padding:18px 20px;border-left:4px solid var(--teal);display:flex;gap:16px;align-items:flex-start}
+.deliv-pts{font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:var(--gold);min-width:54px;text-align:right;flex-shrink:0;line-height:1}
+.deliv-pts span{font-size:11px;font-weight:400;color:var(--neutral);font-family:'DM Mono',monospace;display:block;margin-top:2px}
+.deliv-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;color:var(--teal);margin-bottom:5px}
+.deliv-body{font-size:13.5px;line-height:1.7;color:var(--ink2)}
+
+/* ── RUBRIC ── */
+.rubric-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.legend-pill{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:5px 12px;border-radius:99px}
+.lp-pr{background:var(--pr-bg);color:var(--pr-fg)}
+.lp-dv{background:var(--dv-bg);color:var(--dv-fg)}
+.lp-em{background:var(--em-bg);color:var(--em-fg)}
+.lp-na{background:var(--na-bg);color:var(--na-fg)}
+
+.rubric-criterion{margin-bottom:20px;border:2px solid var(--paper3);border-radius:var(--r);overflow:hidden;box-shadow:3px 3px 0 var(--paper3)}
+.rc-header{background:var(--ink);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.rc-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:13px;color:white}
+.rc-sub{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em}
+.rc-levels{display:grid;grid-template-columns:repeat(4,1fr)}
+.rc-cell{padding:12px 13px;font-size:12.5px;line-height:1.6;border-right:1px solid rgba(0,0,0,.07);vertical-align:top}
+.rc-cell:last-child{border-right:none}
+.rc-cell-hd{font-family:'Outfit',sans-serif;font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.rc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.rc-pr{background:var(--pr-bg)}.rc-pr .rc-cell-hd{color:var(--pr-fg)}
+.rc-dv{background:var(--dv-bg)}.rc-dv .rc-cell-hd{color:var(--dv-fg)}
+.rc-em{background:var(--em-bg)}.rc-em .rc-cell-hd{color:var(--em-fg)}
+.rc-na{background:var(--na-bg)}.rc-na .rc-cell-hd{color:var(--na-fg)}
+
+/* ── SUPPORT ── */
+.support-list{display:flex;flex-direction:column;gap:8px}
+.support-item{background:white;border:1.5px solid var(--paper3);border-radius:var(--r);padding:14px 18px;display:flex;gap:14px;align-items:flex-start;font-size:13.5px;line-height:1.7}
+.s-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.support-item.warn{border-left:4px solid var(--coral)}
+
+/* ── PRINT BUTTON ── */
+.print-btn{position:fixed;bottom:24px;right:24px;background:var(--teal);color:white;border:none;padding:12px 22px;border-radius:99px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:300;transition:all .15s;display:flex;align-items:center;gap:8px}
+.print-btn:hover{background:var(--teal2);transform:translateY(-2px)}
+
+/* ── FOOTER ── */
+.footer{background:var(--ink);color:rgba(245,240,232,.35);text-align:center;padding:22px;font-family:'DM Mono',monospace;font-size:11px;border-top:2px solid var(--gold)}
+.footer a{color:var(--gold2);text-decoration:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .site-header,.hero{padding-left:16px;padding-right:16px}
+  .info-cards{grid-template-columns:1fr 1fr}
+  .rc-levels{grid-template-columns:1fr 1fr}
+  .rc-cell{border-bottom:1px solid rgba(0,0,0,.07)}
+  .scenario-left{min-width:110px;max-width:110px}
+  .main{padding:28px 16px 72px}
+  .sticky-nav-inner{padding:0 12px}
+}
+@media print{.print-btn,.sticky-nav,.site-header{display:none}.hero{padding:24px}.main{padding:20px 0}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">🧩</div>
+      <div>
+        <div class="brand-title">M3 Piecewise Functions Project</div>
+        <div class="brand-sub">Real-World Modelling &nbsp;·&nbsp; Algebra 1</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="code-pill">ALG1A</div>
+      <a class="back-link" href="index.html">&larr; Back</a>
+    </div>
+  </div>
+</header>
+
+<!-- STICKY NAV -->
+<nav class="sticky-nav">
+  <div class="sticky-nav-inner">
+    <a class="nav-pill active" href="#overview">Overview</a>
+    <a class="nav-pill" href="#goals">Goals</a>
+    <a class="nav-pill" href="#plan">5-Day Plan</a>
+    <a class="nav-pill" href="#scenarios">Scenarios</a>
+    <a class="nav-pill" href="#deliverables">Deliverables</a>
+    <a class="nav-pill" href="#rubric">Rubric</a>
+    <a class="nav-pill" href="#support">Support</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Module 3 &nbsp;·&nbsp; Capstone Project</div>
+    <h1 class="hero-title">Piecewise Functions<br><span>in the Real World</span></h1>
+    <p class="hero-sub">Find, model, and explain a real-world situation using a piecewise function with at least 3 pieces — then present it in a video and a live Math Talk.</p>
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="ic-label">Total Value</div>
+        <div class="ic-value gold">100 pts</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Duration</div>
+        <div class="ic-value">5 Days</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Class Code</div>
+        <div class="ic-value" style="font-family:'DM Mono',monospace;font-size:14px">ALG1A</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- OVERVIEW -->
+  <div class="section-bar" id="overview">📋 &nbsp;Overview</div>
+  <div class="intro-box">
+    <p>Piecewise functions are everywhere in the real world — tax brackets, electricity tariffs, parking fees, delivery pricing, and speed limits all follow different rules for different intervals. In this project you will <strong>find, model, and explain</strong> a real-world situation using a piecewise function with at least 3 pieces.</p>
+    <p>Not everything in real life follows one simple rule. A taxi charges differently after the first kilometre. A phone plan changes once you hit your data limit. An electricity bill has one rate for the first 500 kWh and another after that. These are piecewise functions — and they're everywhere.</p>
+    <p>In this project, you'll take a real-world scenario and model it mathematically. You'll define the rules, set the domains, write the function notation, and build the graph. By the end, you won't just understand piecewise functions — you'll have used them to tell a mathematical story about the real world.</p>
+    <p><strong>Work through the three parts in order:</strong> read the brief → study the exemplar → complete your own workbook.</p>
+  </div>
+
+  <!-- GOALS -->
+  <div class="section-bar" id="goals">🎯 &nbsp;Project Goals</div>
+  <p style="font-size:14px;color:var(--neutral);margin-bottom:16px">By the end of this project, you will be able to:</p>
+  <div class="goals-list">
+    <div class="goal-item">
+      <div class="goal-num">1</div>
+      <div class="goal-text"><strong>Recognise</strong> real-world situations that can be modelled using piecewise functions — where different rules apply over different intervals.</div>
+    </div>
+    <div class="goal-item">
+      <div class="goal-num">2</div>
+      <div class="goal-text"><strong>Define domains</strong> for each piece using correct inequality notation (e.g. 0 &le; x &lt; 5).</div>
+    </div>
+    <div class="goal-item">
+      <div class="goal-num">3</div>
+      <div class="goal-text"><strong>Write a piecewise function</strong> using proper mathematical notation, with the correct rule for each domain.</div>
+    </div>
+    <div class="goal-item">
+      <div class="goal-num">4</div>
+      <div class="goal-text"><strong>Graph a piecewise function</strong> accurately — including open and closed endpoints, correct slopes, and labelled axes.</div>
+    </div>
+    <div class="goal-item">
+      <div class="goal-num">5</div>
+      <div class="goal-text"><strong>Interpret your graph</strong> in context — explaining what each piece represents in the real-world scenario.</div>
+    </div>
+    <div class="goal-item">
+      <div class="goal-num">6</div>
+      <div class="goal-text"><strong>Evaluate</strong> a piecewise function at specific input values and explain what the output means in context.</div>
+    </div>
+  </div>
+
+  <!-- FIVE-DAY PLAN -->
+  <div class="section-bar" id="plan">📅 &nbsp;Five-Day Plan</div>
+  <div class="day-list">
+    <div class="day-row">
+      <div class="day-num-col">
+        <div class="day-label">Day</div>
+        <div class="day-name">1</div>
+        <div class="day-label" style="margin-top:4px">Choose</div>
+      </div>
+      <div class="day-body">
+        <div class="day-desc">Choose your scenario from the approved list or propose your own. Define x and f(x) with units. Record your data table with at least 3 pieces.</div>
+        <div class="day-deliverables">
+          <span class="deliv-tag">Scenario approved</span>
+          <span class="deliv-tag">Data table complete</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-row">
+      <div class="day-num-col">
+        <div class="day-label">Day</div>
+        <div class="day-name">2</div>
+        <div class="day-label" style="margin-top:4px">Model</div>
+      </div>
+      <div class="day-body" style="background:var(--paper2)">
+        <div class="day-desc">Write the full piecewise function in curly-brace notation. Check continuity at each boundary. Evaluate f(x) for at least 4 specific x-values.</div>
+        <div class="day-deliverables">
+          <span class="deliv-tag">Piecewise notation</span>
+          <span class="deliv-tag">Continuity check</span>
+          <span class="deliv-tag">4+ evaluations</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-row">
+      <div class="day-num-col">
+        <div class="day-label">Day</div>
+        <div class="day-name">3</div>
+        <div class="day-label" style="margin-top:4px">Graph</div>
+      </div>
+      <div class="day-body">
+        <div class="day-desc">Graph the function by hand or on Desmos. Identify all open/closed boundary dots. Describe graph features and interpret each piece in context.</div>
+        <div class="day-deliverables">
+          <span class="deliv-tag">Annotated graph</span>
+          <span class="deliv-tag">Feature analysis</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-row">
+      <div class="day-num-col">
+        <div class="day-label">Day</div>
+        <div class="day-name">4</div>
+        <div class="day-label" style="margin-top:4px">Report</div>
+      </div>
+      <div class="day-body" style="background:var(--paper2)">
+        <div class="day-desc">Write Sections 1 and 3 of your written report. Record your 3–5 minute explainer video. Submit via Google Drive link in the workbook.</div>
+        <div class="day-deliverables">
+          <span class="deliv-tag">Written report sections</span>
+          <span class="deliv-tag">Video submitted</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-row">
+      <div class="day-num-col">
+        <div class="day-label">Day</div>
+        <div class="day-name">5</div>
+        <div class="day-label" style="margin-top:4px">Extension</div>
+      </div>
+      <div class="day-body">
+        <div class="day-desc">Write f(x) = |x| in piecewise form. Create an absolute value function connected to your scenario in vertex form. Prepare for Math Talk.</div>
+        <div class="day-deliverables">
+          <span class="deliv-tag">Absolute value extension</span>
+          <span class="deliv-tag">Math Talk prep</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIOS -->
+  <div class="section-bar" id="scenarios">📌 &nbsp;Approved Scenarios</div>
+  <div class="scenario-grid">
+    <div class="scenario-card">
+      <div class="scenario-left">
+        <div class="scenario-name">Electricity Tariff</div>
+        <div class="scenario-type">Tiered billing</div>
+      </div>
+      <div class="scenario-right">Saudi Electricity Company charges different rates per kWh across three consumption tiers. Model the monthly bill as a piecewise function of total kWh consumed.</div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-left">
+        <div class="scenario-name">Taxi / Ride Fare</div>
+        <div class="scenario-type">Transport</div>
+      </div>
+      <div class="scenario-right">A fare is calculated with a fixed base, a per-km rate, and a higher rate after a certain distance. Model the total fare as a piecewise function of km travelled.</div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-left">
+        <div class="scenario-name">Income Tax Brackets</div>
+        <div class="scenario-type">Finance</div>
+      </div>
+      <div class="scenario-right">Tax rates differ across income bands. Model the total tax owed as a piecewise function of annual income.</div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-left">
+        <div class="scenario-name">Mobile Data Plan</div>
+        <div class="scenario-type">Technology</div>
+      </div>
+      <div class="scenario-right">Data is unlimited below a cap, throttled above it, and incurs an overage charge beyond a second threshold. Model download speed or cost as a piecewise function of GB used.</div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-left" style="border-right-color:var(--neutral)">
+        <div class="scenario-name" style="color:var(--neutral)">Custom Scenario</div>
+        <div class="scenario-type" style="color:var(--neutral)">Student choice</div>
+      </div>
+      <div class="scenario-right">Propose your own real-world scenario with at least 3 pieces. Must be approved by your teacher by end of Day 1.</div>
+    </div>
+  </div>
+
+  <!-- DELIVERABLES -->
+  <div class="section-bar" id="deliverables">📦 &nbsp;Deliverables</div>
+  <div class="deliv-list">
+    <div class="deliv-card">
+      <div class="deliv-pts">60<span>pts</span></div>
+      <div>
+        <div class="deliv-title">PART A — Interactive Workbook</div>
+        <div class="deliv-body">Complete all five days in the online workbook. Each task is auto-checked and scored by AI feedback. Tasks cover: scenario choice, piecewise notation, continuity, evaluation, graphing, real-world interpretation, written report sections, and the absolute value extension.</div>
+      </div>
+    </div>
+    <div class="deliv-card">
+      <div class="deliv-pts">20<span>pts</span></div>
+      <div>
+        <div class="deliv-title">PART B — Explainer Video</div>
+        <div class="deliv-body">Record a 3–5 minute video. Cover: your piecewise function read aloud, graph with open/closed dots, evaluation of one value per piece, continuity analysis, and your absolute value extension. Submit via Google Drive link in the workbook.</div>
+      </div>
+    </div>
+    <div class="deliv-card">
+      <div class="deliv-pts">20<span>pts</span></div>
+      <div>
+        <div class="deliv-title">PART C — Virtual Math Talk</div>
+        <div class="deliv-body">A 10-minute one-on-one call with your teacher on Day 5. Come ready to explain your function, evaluate a value live, discuss continuity, and connect to absolute value. Practise using Task 5.3 in the workbook.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUBRIC -->
+  <div class="section-bar" id="rubric">📊 &nbsp;Rubric</div>
+  <p style="font-size:14px;color:var(--neutral);margin-bottom:16px">Your project is assessed across three criteria using four performance levels. Your workbook grades these automatically when you submit — your teacher reviews and finalises your level.</p>
+
+  <div class="rubric-legend">
+    <span class="legend-pill lp-pr">● Proficient (PR)</span>
+    <span class="legend-pill lp-dv">● Developing (DV)</span>
+    <span class="legend-pill lp-em">● Emerging (EM)</span>
+    <span class="legend-pill lp-na">● Not Assessed (NA)</span>
+  </div>
+
+  <!-- Criterion 1 -->
+  <div class="rubric-criterion">
+    <div class="rc-header">
+      <div class="rc-title">1. Concepts &amp; Procedures</div>
+      <div class="rc-sub">Piecewise notation &nbsp;·&nbsp; Graph &nbsp;·&nbsp; Evaluation</div>
+    </div>
+    <div class="rc-levels">
+      <div class="rc-cell rc-pr">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--pr-fg)"></span>Proficient</div>
+        Carries out all procedures with precision and fluency. Correctly writes piecewise notation with all pieces, conditions, and curly-brace format. Accurately graphs all segments with correct open/closed endpoints, slopes, and labelled axes. Evaluates f(x) at multiple values across all pieces without errors. Makes clear connections between the algebraic rule, table of values, and graph.
+      </div>
+      <div class="rc-cell rc-dv">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--dv-fg)"></span>Developing</div>
+        Carries out procedures with some precision. Piecewise notation is mostly correct with one or two minor errors in domain boundaries or endpoint notation. Graph is largely accurate with small errors at one or two segments. Makes some connections between representations.
+      </div>
+      <div class="rc-cell rc-em">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--em-fg)"></span>Emerging</div>
+        Carries out procedures with limited precision. Piecewise notation attempted but domains are incomplete or incorrect. Graph has several errors in segments or endpoint dots. Evaluation of f(x) contains errors or is incomplete.
+      </div>
+      <div class="rc-cell rc-na">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--na-fg)"></span>Not Assessed</div>
+        Did not demonstrate knowledge or understanding of piecewise procedures. No notation attempted, no graph produced, or no evaluations completed.
+      </div>
+    </div>
+  </div>
+
+  <!-- Criterion 2 -->
+  <div class="rubric-criterion">
+    <div class="rc-header">
+      <div class="rc-title">2. Reasoning &amp; Communication</div>
+      <div class="rc-sub">Mathematical language &nbsp;·&nbsp; Notation &nbsp;·&nbsp; Justification</div>
+    </div>
+    <div class="rc-levels">
+      <div class="rc-cell rc-pr">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--pr-fg)"></span>Proficient</div>
+        Communicates using precise mathematical language throughout — domain, range, interval, boundary, continuity, open/closed dot — with correct symbolic notation and units. Clearly explains what each piece represents in real-world context with a detailed, organised mathematical argument. Makes valid conceptual connections and justifies all mathematical claims logically.
+      </div>
+      <div class="rc-cell rc-dv">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--dv-fg)"></span>Developing</div>
+        Uses some mathematical language and mostly correct notation. Explains the meaning of most pieces in context with units mostly present. Makes some valid arguments but justification of some claims is incomplete or partially organised.
+      </div>
+      <div class="rc-cell rc-em">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--em-fg)"></span>Emerging</div>
+        Uses limited mathematical language. Notation has significant errors or is missing. Explanation of real-world meaning is vague, incomplete, or missing units. Mathematical thinking is present but disorganised.
+      </div>
+      <div class="rc-cell rc-na">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--na-fg)"></span>Not Assessed</div>
+        Did not demonstrate mathematical language or mathematical thinking. No contextual explanation present.
+      </div>
+    </div>
+  </div>
+
+  <!-- Criterion 3 -->
+  <div class="rubric-criterion">
+    <div class="rc-header">
+      <div class="rc-title">3. Problem Solving &amp; Modelling</div>
+      <div class="rc-sub">Scenario selection &nbsp;·&nbsp; Model construction &nbsp;·&nbsp; Analysis</div>
+    </div>
+    <div class="rc-levels">
+      <div class="rc-cell rc-pr">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--pr-fg)"></span>Proficient</div>
+        Selects an appropriate real-world scenario and constructs a complete, accurate piecewise model with at least 3 pieces. Executes all procedures accurately. Provides in-depth written analysis explaining why piecewise modelling fits the situation, what each piece represents, and what happens at boundaries.
+      </div>
+      <div class="rc-cell rc-dv">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--dv-fg)"></span>Developing</div>
+        Selects an appropriate scenario and builds a mostly complete model. Executes procedures with some minor computational errors. Evaluates the function at most input values correctly. Provides some analysis of the modelling choice.
+      </div>
+      <div class="rc-cell rc-em">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--em-fg)"></span>Emerging</div>
+        Selects a scenario but the model is incomplete or has conceptual errors. Evaluation of f(x) contains errors. Analysis of the modelling choice is limited — pieces or boundaries are not explained in real-world terms.
+      </div>
+      <div class="rc-cell rc-na">
+        <div class="rc-cell-hd"><span class="rc-dot" style="background:var(--na-fg)"></span>Not Assessed</div>
+        Did not provide analysis of problem solving strategies. No real-world scenario modelled, or no evaluation or analysis attempted.
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="section-bar" id="support">📚 &nbsp;Support Resources</div>
+  <div class="support-list">
+    <div class="support-item">
+      <span class="s-icon">🧩</span>
+      <div><strong>m3-review.html</strong> on the classroom portal (ALG1A) &mdash; the Piecewise Functions and Absolute Value sections have all the notation rules, graphing methods, and word problem practice you need.</div>
+    </div>
+    <div class="support-item">
+      <span class="s-icon">💻</span>
+      <div><strong>Desmos</strong> (<a href="https://desmos.com/calculator" target="_blank" style="color:var(--teal)">desmos.com/calculator</a>) &mdash; type piecewise functions directly using curly braces and Desmos will graph each piece with boundary dots automatically. Try: <code style="background:var(--paper2);padding:2px 7px;border-radius:4px;font-size:12px">{x&gt;=0: 2x+1, x&lt;0: -x+3}</code></div>
+    </div>
+    <div class="support-item">
+      <span class="s-icon">👩‍🏫</span>
+      <div><strong>Your teacher</strong> &mdash; message via Google Classroom for scenario approval (Day 1) and draft feedback (Day 3). Schedule your Math Talk time on Day 4.</div>
+    </div>
+    <div class="support-item warn">
+      <span class="s-icon">❗</span>
+      <div><strong>Academic integrity:</strong> All written analysis and interpretations must be your own. You may use Desmos or a calculator for graphs and arithmetic, but all explanations of what the mathematics means must be in your own words.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;padding-top:20px;border-top:2px solid var(--paper3);text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--neutral)">
+    M3: Sequences and Functions &nbsp;&middot;&nbsp; Piecewise Functions Project &nbsp;&middot;&nbsp; Algebra 1 Virtual Classroom &nbsp;&middot;&nbsp; raaziaali.github.io
+  </div>
+
+</main>
+
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+
+<footer class="footer">
+  <a href="https://raaziaali.github.io">← Back to Main Portal</a>
+  &nbsp;·&nbsp; raaziaali.github.io/Algebra-1
+</footer>
+
+<script>
+// Highlight active nav pill on scroll
+var sections = document.querySelectorAll('.section-bar[id]');
+var pills = document.querySelectorAll('.nav-pill');
+function onScroll() {
+  var scrollY = window.scrollY + 140;
+  var active = null;
+  sections.forEach(function(s) {
+    if (s.offsetTop <= scrollY) active = s.id;
+  });
+  pills.forEach(function(p) {
+    p.classList.toggle('active', p.getAttribute('href') === '#' + active);
+  });
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+</body>
+</html>
